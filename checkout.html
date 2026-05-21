@@ -371,8 +371,47 @@
           const cart = load();
           if (cart.length === 0) return;
 
-          localStorage.removeItem(KEY);
-          document.getElementById('confirm-overlay').classList.add('show');
+          const btn = document.getElementById('place-order-btn');
+          const f   = document.getElementById('checkout-form');
+
+          const orderLines = cart.map(item => item.name + ' — $' + item.price).join('\n');
+          const total      = cart.reduce((s, i) => s + i.price, 0);
+
+          const payload = {
+            _subject:      'New Order — Gibraltar Bat',
+            name:          f['first-name'].value + ' ' + f['last-name'].value,
+            email:         f['email'].value,
+            phone:         f['phone'].value || '—',
+            address:       f['address'].value + ', ' + f['city'].value + ', ' + f['state'].value + ' ' + f['zip'].value,
+            order_items:   orderLines,
+            order_total:   '$' + total,
+            notes:         f['notes'].value || '—',
+          };
+
+          btn.disabled = true;
+          btn.textContent = 'Placing Order...';
+
+          fetch('https://formspree.io/f/xkoerzdy', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body:    JSON.stringify(payload),
+          })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.ok) {
+              localStorage.removeItem(KEY);
+              document.getElementById('confirm-overlay').classList.add('show');
+            } else {
+              btn.disabled = false;
+              btn.textContent = 'Place Order';
+              alert('Something went wrong. Please email us directly at gibraltarbat@gmail.com');
+            }
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.textContent = 'Place Order';
+            alert('Something went wrong. Please email us directly at gibraltarbat@gmail.com');
+          });
         });
       });
     })();
