@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed — Gibraltar Bat</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Gibraltar <span>Bat</span></div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="cart-btn" id="cart-toggle" aria-label="Shopping cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count"></span>
+    </button>
+  </nav>
+
+  <div style="max-width: 560px; margin: 6rem auto; padding: 2rem; text-align: center;">
+    <h1 style="color: var(--navy); font-size: 2rem; margin-bottom: 1rem;">Order Confirmed</h1>
+    <p style="font-family: Arial, sans-serif; color: #555; font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem;">
+      Thank you for your order. You'll receive a receipt from Stripe and we'll be in touch within 24 hours to confirm your order details and shipment.
+    </p>
+    <a href="index.html" class="btn btn-primary" style="background: var(--navy); color: var(--gold); border-color: var(--navy);">Back to Home</a>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Gibraltar <span>Bat</span></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <p>&copy; 2026 Gibraltar Bat. All rights reserved.</p>
+    <p style="margin-top:0.5rem; font-size:0.78rem;"><a href="privacy-policy.html" style="color:#aaa;">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="terms.html" style="color:#aaa;">Terms &amp; Conditions</a> &nbsp;&middot;&nbsp; <a href="refund-policy.html" style="color:#aaa;">Refund Policy</a></p>
+  </footer>
+
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">Cart</div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <a href="checkout.html" class="btn-checkout">Check Out</a>
+    </div>
+  </div>
+  <script src="js/cart.js"></script>
+  <script>localStorage.removeItem('gibraltar-cart');</script>
+</body>
+</html>
