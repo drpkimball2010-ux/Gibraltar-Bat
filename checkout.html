@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Gibraltar Bat</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .checkout-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ── Order Summary ── */
+    .order-summary {
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 10px;
+      padding: 2rem 1.8rem;
+    }
+
+    .order-summary h2 {
+      font-size: 1.15rem;
+      margin-bottom: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-family: Arial, sans-serif;
+      font-size: 0.88rem;
+    }
+    .summary-item:last-of-type { border-bottom: none; }
+
+    .summary-item-name { color: #ddd; }
+    .summary-item-price { color: var(--white); font-weight: 700; }
+
+    .summary-empty {
+      font-family: Arial, sans-serif;
+      font-size: 0.85rem;
+      color: #aaa;
+      padding: 0.5rem 0;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.2rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--gold);
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .summary-total span:last-child { color: var(--gold); font-size: 1.15rem; }
+
+    /* ── Checkout Form ── */
+    .checkout-form h2 {
+      font-size: 1.35rem;
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+    }
+
+    .checkout-form .form-subtitle {
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      color: #888;
+      margin-bottom: 2rem;
+    }
+
+    .form-section-label {
+      font-family: Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 1.6rem 0 0.8rem;
+    }
+    .form-section-label:first-of-type { margin-top: 0; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .form-field.full { grid-column: 1 / -1; }
+
+    .form-field label {
+      font-family: Arial, sans-serif;
+      font-size: 0.78rem;
+      color: #555;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      padding: 0.6rem 0.75rem;
+      border: 1.5px solid #ddd;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 0.88rem;
+      color: var(--navy);
+      background: white;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus { border-color: var(--navy); }
+
+    .form-field textarea { resize: vertical; min-height: 70px; }
+
+    .btn-place-order {
+      display: block;
+      width: 100%;
+      margin-top: 1.8rem;
+      padding: 1rem;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-place-order:hover { background: var(--gold); color: var(--navy); }
+    .btn-place-order:disabled {
+      background: #ccc;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .empty-warning {
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      color: #cc2200;
+      margin-top: 0.6rem;
+      display: none;
+    }
+
+    /* Confirmation overlay */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11,26,46,0.82);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+    }
+    .confirm-overlay.show { display: flex; }
+
+    .confirm-box {
+      background: white;
+      border-radius: 12px;
+      padding: 3rem 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+    .confirm-box h2 {
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+    }
+    .confirm-box p {
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .confirm-box .btn {
+      display: inline-block;
+      background: var(--navy);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+    .confirm-box .btn:hover { background: var(--gold); color: var(--navy); }
+
+    @media (max-width: 700px) {
+      .checkout-wrap { grid-template-columns: 1fr; gap: 2rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Gibraltar <span>Bat</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="cart-btn" id="cart-toggle" aria-label="Shopping cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count"></span>
+    </button>
+  </nav>
+
+  <div class="checkout-wrap">
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      <div id="summary-items"></div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span id="summary-total">$0</span>
+      </div>
+    </div>
+
+    <!-- Customer Info Form -->
+    <div class="checkout-form">
+      <h2>Your Information</h2>
+      <p class="form-subtitle">We'll use this to confirm and ship your order.</p>
+
+      <form id="checkout-form" novalidate>
+
+        <p class="form-section-label">Contact</p>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="first-name">First Name</label>
+            <input type="text" id="first-name" name="first-name" required />
+          </div>
+          <div class="form-field">
+            <label for="last-name">Last Name</label>
+            <input type="text" id="last-name" name="last-name" required />
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-field">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" />
+          </div>
+        </div>
+
+        <p class="form-section-label">Shipping Address</p>
+        <div class="form-row">
+          <div class="form-field full">
+            <label for="address">Street Address</label>
+            <input type="text" id="address" name="address" required />
+          </div>
+          <div class="form-field">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required />
+          </div>
+          <div class="form-field">
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" maxlength="2" required />
+          </div>
+          <div class="form-field">
+            <label for="zip">ZIP Code</label>
+            <input type="text" id="zip" name="zip" maxlength="10" required />
+          </div>
+        </div>
+
+        <p class="form-section-label">Order Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.75rem;color:#aaa;">(optional)</span></p>
+        <div class="form-field full">
+          <textarea id="notes" name="notes" placeholder="Length preferences, engravings, or anything else..."></textarea>
+        </div>
+
+        <p class="empty-warning" id="empty-warning">Please add items to your cart before checking out.</p>
+        <button type="submit" class="btn-place-order" id="place-order-btn">Place Order</button>
+
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Confirmation overlay -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <h2>Order Received</h2>
+      <p>Thank you for your order. We'll be in touch within 24 hours to confirm details and arrange payment.</p>
+      <a href="index.html" class="btn">Back to Home</a>
+    </div>
+  </div>
+
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">Cart</div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <a href="checkout.html" class="btn-checkout">Check Out</a>
+    </div>
+  </div>
+
+  <script src="js/cart.js"></script>
+  <script>
+    (function () {
+      const KEY = 'gibraltar-cart';
+
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+        catch (_) { return []; }
+      }
+
+      function renderSummary() {
+        const cart    = load();
+        const itemsEl = document.getElementById('summary-items');
+        const totalEl = document.getElementById('summary-total');
+        const btn     = document.getElementById('place-order-btn');
+        const warn    = document.getElementById('empty-warning');
+
+        if (cart.length === 0) {
+          itemsEl.innerHTML = '<p class="summary-empty">Your cart is empty.</p>';
+          totalEl.textContent = '$0';
+          btn.disabled = true;
+          warn.style.display = 'block';
+        } else {
+          itemsEl.innerHTML = cart.map(item =>
+            `<div class="summary-item">
+              <span class="summary-item-name">${item.name}</span>
+              <span class="summary-item-price">$${item.price}</span>
+            </div>`
+          ).join('');
+          const total = cart.reduce((s, i) => s + i.price, 0);
+          totalEl.textContent = '$' + total;
+          btn.disabled = false;
+          warn.style.display = 'none';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        renderSummary();
+
+        document.getElementById('checkout-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          const cart = load();
+          if (cart.length === 0) return;
+
+          localStorage.removeItem(KEY);
+          document.getElementById('confirm-overlay').classList.add('show');
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

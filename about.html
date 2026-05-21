@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Gibraltar Bat</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="nav-logo">Gibraltar <span>Bat</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="cart-btn" id="cart-toggle" aria-label="Shopping cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count"></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="about-hero">
+    <h1>The <span>Gibraltar</span> Story</h1>
+    <p>Built from a love of the game and a belief that every player deserves a great bat.</p>
+  </section>
+
+  <!-- STORY -->
+  <section style="padding: 5rem 2rem;">
+    <div class="about-body">
+
+      <h2>Where It Started</h2>
+      <div class="gold-line"></div>
+      <p>
+        Gibraltar Bat was founded with one simple goal: to give all players access to high-quality bats at honest prices.
+      </p>
+      <p>
+        Every bat is handcrafted one at a time by a player, for players. The wood is carefully selected from dense forests in Maine, chosen for its durability, balance, and light swing weight. To us, a bat is more than just a piece of wood — it's an extension of the player who trusts it every time they step into the box, and that responsibility is taken seriously.
+      </p>
+      <p>
+        Only premium paints and finishes are used, and every bat undergoes a manual grain-tightening process to maximize pop, performance, and durability.
+      </p>
+      <p>
+        When you choose a Gibraltar Bat, you're not just choosing another stick. You're choosing craftsmanship, passion, and the story behind every swing.
+      </p>
+      <p style="margin-top: 1.5rem; font-style: italic;">— Danny</p>
+
+      <h2 style="margin-top: 3rem;">Why Gibraltar?</h2>
+      <div class="gold-line"></div>
+      <p>
+        Gibraltar is a name that means strength, permanence, and reliability. That's exactly what we build into every bat we sell. Whether you're a 10-year-old stepping up to the plate for the first time or a seasoned player chasing a championship, you deserve equipment that won't let you down.
+      </p>
+      <p>
+        We're a small operation — and we like it that way. Every bat gets our full attention. Every order matters to us personally.
+      </p>
+
+      <!-- VALUES -->
+      <h2 style="margin-top: 3rem; text-align: center;">What We Stand For</h2>
+      <div class="gold-line" style="margin: 1rem auto;"></div>
+      <div class="values-grid">
+        <div class="value-item">
+          <h3>Quality Wood</h3>
+          <p>We only use premium-grade billets. No shortcuts on materials.</p>
+        </div>
+        <div class="value-item">
+          <h3>Honest Pricing</h3>
+          <p>Pro-quality bats shouldn't cost $300. We keep it fair.</p>
+        </div>
+        <div class="value-item">
+          <h3>Love of the Game</h3>
+          <p>We're players first. We build what we'd want to swing ourselves.</p>
+        </div>
+        <div class="value-item" style="grid-column: 2;">
+          <h3>Stand Behind It</h3>
+          <p>Every bat comes with our 30-day satisfaction guarantee.</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 3.5rem;">
+        <a href="shop.html" class="btn btn-primary" style="background: var(--navy); color: var(--gold); border-color: var(--navy);">Shop the Lineup</a>
+        <a href="contact.html" class="btn btn-secondary" style="color: var(--navy); border-color: var(--navy); margin-left: 1rem;">Get in Touch</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Gibraltar <span>Bat</span></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <p>&copy; 2026 Gibraltar Bat. All rights reserved.</p>
+    <p style="margin-top:0.5rem; font-size:0.78rem;"><a href="privacy-policy.html" style="color:#aaa;">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="terms.html" style="color:#aaa;">Terms &amp; Conditions</a> &nbsp;&middot;&nbsp; <a href="refund-policy.html" style="color:#aaa;">Refund Policy</a></p>
+  </footer>
+
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">Cart</div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <a href="checkout.html" class="btn-checkout">Check Out</a>
+    </div>
+  </div>
+  <script src="js/cart.js"></script>
+</body>
+</html>

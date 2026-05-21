@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Your Bat — Gibraltar Bat</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { overflow: hidden; }
+
+    .config-wrap {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    #bat-canvas {
+      flex: 1;
+      display: block;
+      cursor: grab;
+    }
+    #bat-canvas:active { cursor: grabbing; }
+
+    .config-panel {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--white);
+      padding: 1.5rem 1.5rem 2rem;
+      overflow-y: auto;
+      border-left: 3px solid var(--gold);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .config-panel h2 {
+      font-size: 1.35rem;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .config-hint {
+      font-family: Arial, sans-serif;
+      font-size: 0.78rem;
+      color: #999;
+      margin: -0.6rem 0 0;
+    }
+
+    .config-divider {
+      border: none;
+      border-top: 1px solid #e5e5e5;
+      margin: 0;
+    }
+
+    .config-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .config-group label {
+      display: block;
+      font-family: Arial, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    .len-options {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .len-btn {
+      flex: 1;
+      padding: 0.5rem 0.2rem;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      background: white;
+      color: var(--navy);
+      font-family: Arial, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .len-btn:hover { border-color: var(--navy); }
+    .len-btn.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+    }
+
+    .swatches {
+      display: flex;
+      gap: 0.55rem;
+    }
+
+    .swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+      outline: none;
+      padding: 0;
+    }
+    .swatch:hover { transform: scale(1.1); }
+    .swatch.active {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px var(--navy);
+      transform: scale(1.13);
+    }
+    .swatch[data-color="natural"] { background: #C8A96E; }
+    .swatch[data-color="red"]     { background: #BB0000; }
+    .swatch[data-color="black"]   { background: #111111; }
+    .swatch[data-color="blue"]    { background: #1B4FBF; }
+
+    .color-name {
+      font-family: Arial, sans-serif;
+      font-size: 0.8rem;
+      color: #666;
+      min-height: 1.1rem;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+    }
+    .price-row-label {
+      font-family: Arial, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .price-row-value {
+      font-family: Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    .btn-add-cart {
+      display: block;
+      width: 100%;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 0.9rem 1.2rem;
+      border-radius: 6px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-add-cart:hover { background: var(--navy); color: white; }
+
+    @media (max-width: 640px) {
+      body { overflow: auto; }
+      .config-wrap { flex-direction: column; height: auto; }
+      #bat-canvas { width: 100%; height: 65vw; min-height: 320px; }
+      .config-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 3px solid var(--gold);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Gibraltar <span>Bat</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="cart-btn" id="cart-toggle" aria-label="Shopping cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count"></span>
+    </button>
+  </nav>
+
+  <div class="config-wrap">
+    <canvas id="bat-canvas"></canvas>
+
+    <aside class="config-panel">
+      <h2>Design Your Bat</h2>
+      <p class="config-hint">Drag to rotate &nbsp;&middot;&nbsp; Scroll to zoom</p>
+
+      <hr class="config-divider" />
+
+      <!-- Bat Type -->
+      <div class="config-group">
+        <label>Bat Type</label>
+        <div class="len-options">
+          <button class="len-btn active" data-type="standard">Standard</button>
+          <button class="len-btn" data-type="torpedo">Torpedo</button>
+          <button class="len-btn" data-type="fungo">Fungo</button>
+        </div>
+      </div>
+
+      <!-- Wood -->
+      <div class="config-group" id="wood-group">
+        <label>Wood</label>
+        <div class="len-options">
+          <button class="len-btn active" data-wood="maple">Maple</button>
+          <button class="len-btn" data-wood="ash">Ash</button>
+          <button class="len-btn" data-wood="birch">Birch</button>
+        </div>
+      </div>
+
+      <!-- Standard Length -->
+      <div class="config-group" id="std-length-group">
+        <label>Length</label>
+        <div class="len-options">
+          <button class="len-btn" data-std-len="30">30"</button>
+          <button class="len-btn" data-std-len="31">31"</button>
+          <button class="len-btn" data-std-len="32">32"</button>
+          <button class="len-btn active" data-std-len="33">33"</button>
+        </div>
+      </div>
+
+      <!-- Fungo Length (hidden until Fungo selected) -->
+      <div class="config-group" id="fungo-length-group" style="display:none">
+        <label>Length</label>
+        <div class="len-options">
+          <button class="len-btn" data-fungo-len="34">34"</button>
+          <button class="len-btn" data-fungo-len="35">35"</button>
+          <button class="len-btn active" data-fungo-len="36">36"</button>
+        </div>
+      </div>
+
+      <div class="config-group">
+        <label>Barrel Color</label>
+        <div class="swatches" id="barrel-swatches"></div>
+        <div class="color-name" id="barrel-name">Natural</div>
+      </div>
+
+      <div class="config-group">
+        <label>Handle Color</label>
+        <div class="swatches" id="handle-swatches"></div>
+        <div class="color-name" id="handle-name">Natural</div>
+      </div>
+
+      <hr class="config-divider" />
+
+      <div class="price-row">
+        <span class="price-row-label">Price</span>
+        <span class="price-row-value" id="price-display">$145</span>
+      </div>
+
+      <button class="btn-add-cart" id="btn-add-cart">Add to Cart</button>
+    </aside>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    // ─── Shared constants ────────────────────────────────────────────────────
+    const SCALE    = 0.08;
+    const HANDLE_R = 0.55;
+    const BARREL_R = 1.30;
+    const BEVEL_H  = 0.25;
+    const BEVEL_IN = 0.25;
+    const KNOB_H   = 1.50;
+    const SEG      = 80;
+
+    // Fungo base dimensions (at 36")
+    const FHANDLE_R = 0.4375;   // 7/8" radius
+    const FBARREL_R = 1.125;    // 2.25" / 2
+    const FKNOB_H   = 2.0;      // 2" knob (fixed)
+
+    // ─── Renderer ────────────────────────────────────────────────────────────
+    const canvas = document.getElementById('bat-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    // ─── Scene ───────────────────────────────────────────────────────────────
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1a2e);
+
+    // ─── Camera ──────────────────────────────────────────────────────────────
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 100);
+    camera.position.set(0.35, 0, 6.0);
+
+    // ─── Controls ────────────────────────────────────────────────────────────
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.07;
+    controls.minDistance   = 3.0;
+    controls.maxDistance   = 12.0;
+    controls.target.set(0, 0, 0);
+
+    // ─── Lighting ────────────────────────────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffffff, 0.30));
+
+    const keyLight = new THREE.DirectionalLight(0xfff8e8, 1.2);
+    keyLight.position.set(4, 6, 4);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xc8dcff, 0.45);
+    fillLight.position.set(-4, 2, 3);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffd080, 0.30);
+    rimLight.position.set(0, -4, -3);
+    scene.add(rimLight);
+
+    // ─── Materials ───────────────────────────────────────────────────────────
+    const COLORS = {
+      natural: { label: 'Natural', hex: 0xC8A96E, roughness: 0.78, metalness: 0.04 },
+      red:     { label: 'Red',     hex: 0xBB0000, roughness: 0.38, metalness: 0.04 },
+      black:   { label: 'Black',   hex: 0x000000, roughness: 0.28, metalness: 0.05 },
+      blue:    { label: 'Blue',    hex: 0x0D2878, roughness: 0.40, metalness: 0.04 },
+    };
+
+    const handleMat = new THREE.MeshStandardMaterial({
+      color: COLORS.natural.hex, roughness: COLORS.natural.roughness, metalness: COLORS.natural.metalness,
+    });
+    const barrelMat = new THREE.MeshStandardMaterial({
+      color: COLORS.natural.hex, roughness: COLORS.natural.roughness, metalness: COLORS.natural.metalness,
+    });
+
+    // ─── Bat group ───────────────────────────────────────────────────────────
+    const bat = new THREE.Group();
+    bat.rotation.z = 0.14;
+    scene.add(bat);
+
+    const handleMesh  = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
+    const barrelMesh  = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
+    const capMesh     = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
+    const knobCapMesh = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
+    handleMesh.castShadow = true;
+    barrelMesh.castShadow = true;
+    bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh);
+
+    // ─── State ───────────────────────────────────────────────────────────────
+    let batType     = 'standard';
+    let wood        = 'maple';
+    let stdLength   = 33;
+    let fungoLength = 36;
+
+    const PRICES = {
+      standard: { maple: 145, birch: 130, ash: 85 },
+      torpedo:  { maple: 145, birch: 130, ash: 85 },
+      fungo:    { maple: 100, birch: 100, ash: 100 },
+    };
+
+    function getPrice() {
+      return PRICES[batType][wood];
+    }
+
+    function getCartName() {
+      const len    = batType === 'standard' ? stdLength : fungoLength;
+      const w      = batType === 'fungo' ? 'Maple' : wood.charAt(0).toUpperCase() + wood.slice(1);
+      const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : 'Standard';
+      const barrel = document.getElementById('barrel-name').textContent;
+      const handle = document.getElementById('handle-name').textContent;
+      return 'Custom ' + w + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle;
+    }
+
+    function updatePrice() {
+      document.getElementById('price-display').textContent = '$' + getPrice();
+    }
+
+    // ─── Standard bat geometry ───────────────────────────────────────────────
+    function rebuildStandard(length) {
+      const hl = 12;
+      const bl =  6;
+      const tl = length - KNOB_H - hl - bl - BEVEL_H;
+
+      const yKnobEnd   = KNOB_H;
+      const yHandleEnd = yKnobEnd   + hl;
+      const yTaperEnd  = yHandleEnd + tl;
+      const yBarrelEnd = yTaperEnd  + bl;
+      const yTopFace   = yBarrelEnd + BEVEL_H;
+
+      const PAINT_DEPTH = 15 * (length / 33);
+      const yPaint      = yTopFace - PAINT_DEPTH;
+
+      const tPaint = (yPaint - yHandleEnd) / tl;
+      const rPaint = HANDLE_R + tPaint * (BARREL_R - HANDLE_R);
+
+      const mid = yTopFace / 2;
+      const S = SCALE;
+      const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
+
+      const hPts = [
+        v(0.85, 0),        // flat knob bottom edge
+        v(0.85, 0.333),    // top of 1/3" flat section
+        v(0.80, 0.600),    // taper begins
+        v(0.72, 0.900),
+        v(0.63, 1.200),
+        v(HANDLE_R, yKnobEnd),
+        v(HANDLE_R, yHandleEnd),
+      ];
+
+      for (let i = 1; i <= 3; i++) {
+        const t = (i / 4) * tPaint;
+        hPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+      }
+      hPts.push(v(rPaint, yPaint));
+
+      const bPts = [v(rPaint, yPaint)];
+
+      for (let i = 1; i <= 3; i++) {
+        const t = tPaint + (i / 4) * (1 - tPaint);
+        bPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+      }
+      bPts.push(v(BARREL_R, yTaperEnd));
+      bPts.push(v(BARREL_R, yBarrelEnd));
+
+      for (let i = 1; i <= 6; i++) {
+        const theta = (Math.PI / 2) * (i / 6);
+        bPts.push(v(
+          (BARREL_R - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
+          yBarrelEnd + BEVEL_H * Math.sin(theta)
+        ));
+      }
+
+      const capR = (BARREL_R - BEVEL_IN) * S;
+      const capY = (yTopFace - mid) * S;
+
+      handleMesh.geometry.dispose();
+      barrelMesh.geometry.dispose();
+      capMesh.geometry.dispose();
+
+      handleMesh.geometry = new THREE.LatheGeometry(hPts, SEG);
+      barrelMesh.geometry = new THREE.LatheGeometry(bPts, SEG);
+
+      const capGeo = new THREE.CircleGeometry(capR, SEG);
+      capGeo.rotateX(-Math.PI / 2);
+      capMesh.geometry = capGeo;
+      capMesh.position.y = capY;
+
+      const knobCapGeo = new THREE.CircleGeometry(0.85 * S, SEG);
+      knobCapGeo.rotateX(Math.PI / 2);
+      knobCapMesh.geometry = knobCapGeo;
+      knobCapMesh.position.y = (0 - mid) * S;
+    }
+
+    // ─── Torpedo bat geometry ────────────────────────────────────────────────
+    //
+    // Identical to standard from knob to 29" (proportionally scaled).
+    // At 29" the barrel begins a 1/4" taper in radius to the end of the bat.
+    //
+    function rebuildTorpedo(length) {
+      const hl = 12;
+      const bl =  6;
+      const tl = length - KNOB_H - hl - bl - BEVEL_H;
+
+      const yKnobEnd   = KNOB_H;
+      const yHandleEnd = yKnobEnd   + hl;
+      const yTaperEnd  = yHandleEnd + tl;
+      const yBarrelEnd = yTaperEnd  + bl;
+      const yTopFace   = yBarrelEnd + BEVEL_H;
+
+      // Paint boundary: same as standard
+      const PAINT_DEPTH = 15 * (length / 33);
+      const yPaint = yTopFace - PAINT_DEPTH;
+      const tPaint = (yPaint - yHandleEnd) / tl;
+      const rPaint = HANDLE_R + tPaint * (BARREL_R - HANDLE_R);
+
+      const mid = yTopFace / 2;
+      const S = SCALE;
+      const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
+
+      // Handle geometry: identical to standard
+      const hPts = [
+        v(0.85, 0),
+        v(0.85, 0.333),
+        v(0.80, 0.600),
+        v(0.72, 0.900),
+        v(0.63, 1.200),
+        v(HANDLE_R, yKnobEnd),
+        v(HANDLE_R, yHandleEnd),
+      ];
+      for (let i = 1; i <= 3; i++) {
+        const t = (i / 4) * tPaint;
+        hPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+      }
+      hPts.push(v(rPaint, yPaint));
+
+      // Barrel geometry: standard up to 29", then 1/4" taper to end
+      const bPts = [v(rPaint, yPaint)];
+      for (let i = 1; i <= 3; i++) {
+        const t = tPaint + (i / 4) * (1 - tPaint);
+        bPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+      }
+
+      const yTorpedo   = yTopFace - 6;       // 6" from the top — taper starts here (fixed)
+      const torpedoEndR = BARREL_R - 0.25;  // 1.05" at the very end
+
+      bPts.push(v(BARREL_R, yTaperEnd));  // barrel bottom — still full width
+      bPts.push(v(BARREL_R, yTorpedo));   // 29" mark — taper starts here
+
+      // Smooth taper from BARREL_R at yTorpedo to torpedoEndR at yTopFace
+      for (let i = 1; i <= 5; i++) {
+        const t = i / 6;
+        bPts.push(v(
+          BARREL_R - 0.25 * t,
+          yTorpedo + t * (yTopFace - yTorpedo)
+        ));
+      }
+      bPts.push(v(torpedoEndR, yTopFace));  // tip of taper at flat face
+
+      const capR = torpedoEndR * S;
+      const capY = (yTopFace - mid) * S;
+
+      handleMesh.geometry.dispose();
+      barrelMesh.geometry.dispose();
+      capMesh.geometry.dispose();
+      knobCapMesh.geometry.dispose();
+
+      handleMesh.geometry = new THREE.LatheGeometry(hPts, SEG);
+      barrelMesh.geometry = new THREE.LatheGeometry(bPts, SEG);
+
+      const capGeo = new THREE.CircleGeometry(capR, SEG);
+      capGeo.rotateX(-Math.PI / 2);
+      capMesh.geometry = capGeo;
+      capMesh.position.y = capY;
+
+      const knobCapGeo = new THREE.CircleGeometry(0.85 * S, SEG);
+      knobCapGeo.rotateX(Math.PI / 2);
+      knobCapMesh.geometry = knobCapGeo;
+      knobCapMesh.position.y = (0 - mid) * S;
+    }
+
+    // ─── Fungo bat geometry ──────────────────────────────────────────────────
+    //
+    // Base spec at 36": knob 2" (fixed), handle 12", barrel 8", bevel 0.25" (fixed)
+    // Taper fills the remainder with a non-linear profile —
+    //   gentle radius change near the barrel, steeper near the handle.
+    //
+    function rebuildFungo(length) {
+      const fkl = FKNOB_H;
+      const fhl = 12;
+      const fbl = 8;
+      const ftl = length - fkl - fhl - fbl - BEVEL_H;  // taper absorbs size change
+
+      const yKnobEnd   = fkl;
+      const yHandleEnd = yKnobEnd   + fhl;
+      const yTaperEnd  = yHandleEnd + ftl;
+      const yBarrelEnd = yTaperEnd  + fbl;
+      const yTopFace   = yBarrelEnd + BEVEL_H;
+
+      const PAINT_DEPTH = 17 * (length / 36);
+      const yPaint      = yTopFace - PAINT_DEPTH;
+
+      // t=0 at handle end of taper, t=1 at barrel start
+      const tPaint = (yPaint - yHandleEnd) / ftl;
+
+      const fTaper = t => FHANDLE_R + (FBARREL_R - FHANDLE_R) * t;
+      const rPaint = fTaper(tPaint);
+
+      const mid = yTopFace / 2;
+      const S = SCALE;
+      const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
+
+      const hPts = [
+        v(0.68, 0),        // flat knob bottom edge
+        v(0.68, 0.333),    // top of 1/3" flat section
+        v(0.62, 0.750),    // taper begins
+        v(0.55, 1.200),
+        v(0.49, 1.650),
+        v(FHANDLE_R, yKnobEnd),
+        v(FHANDLE_R, yHandleEnd),
+      ];
+
+      for (let i = 1; i <= 3; i++) {
+        const t = (i / 4) * tPaint;
+        hPts.push(v(fTaper(t), yHandleEnd + t * ftl));
+      }
+      hPts.push(v(rPaint, yPaint));
+
+      const bPts = [v(rPaint, yPaint)];
+
+      for (let i = 1; i <= 3; i++) {
+        const t = tPaint + (i / 4) * (1 - tPaint);
+        bPts.push(v(fTaper(t), yHandleEnd + t * ftl));
+      }
+      bPts.push(v(FBARREL_R, yTaperEnd));
+      bPts.push(v(FBARREL_R, yBarrelEnd));
+
+      for (let i = 1; i <= 6; i++) {
+        const theta = (Math.PI / 2) * (i / 6);
+        bPts.push(v(
+          (FBARREL_R - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
+          yBarrelEnd + BEVEL_H * Math.sin(theta)
+        ));
+      }
+
+      const capR = (FBARREL_R - BEVEL_IN) * S;
+      const capY = (yTopFace - mid) * S;
+
+      handleMesh.geometry.dispose();
+      barrelMesh.geometry.dispose();
+      capMesh.geometry.dispose();
+
+      handleMesh.geometry = new THREE.LatheGeometry(hPts, SEG);
+      barrelMesh.geometry = new THREE.LatheGeometry(bPts, SEG);
+
+      const capGeo = new THREE.CircleGeometry(capR, SEG);
+      capGeo.rotateX(-Math.PI / 2);
+      capMesh.geometry = capGeo;
+      capMesh.position.y = capY;
+
+      const knobCapGeo = new THREE.CircleGeometry(0.68 * S, SEG);
+      knobCapGeo.rotateX(Math.PI / 2);
+      knobCapMesh.geometry = knobCapGeo;
+      knobCapMesh.position.y = (0 - mid) * S;
+    }
+
+    // ─── Dispatcher ──────────────────────────────────────────────────────────
+    function rebuildBat() {
+      if (batType === 'torpedo') {
+        rebuildTorpedo(stdLength);
+      } else if (batType === 'fungo') {
+        rebuildFungo(fungoLength);
+      } else {
+        rebuildStandard(stdLength);
+      }
+    }
+
+    rebuildBat();
+
+    // ─── UI event handlers ───────────────────────────────────────────────────
+
+    document.querySelectorAll('[data-type]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        batType = btn.dataset.type;
+        document.getElementById('std-length-group').style.display   = batType !== 'fungo' ? '' : 'none';
+        document.getElementById('fungo-length-group').style.display = batType === 'fungo' ? '' : 'none';
+        document.getElementById('wood-group').style.display         = batType === 'fungo' ? 'none' : '';
+        updatePrice();
+        rebuildBat();
+      });
+    });
+
+    document.querySelectorAll('[data-wood]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-wood]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        wood = btn.dataset.wood;
+        updatePrice();
+      });
+    });
+
+    document.querySelectorAll('[data-std-len]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-std-len]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        stdLength = parseInt(btn.dataset.stdLen, 10);
+        rebuildBat();
+      });
+    });
+
+    document.querySelectorAll('[data-fungo-len]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-fungo-len]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fungoLength = parseInt(btn.dataset.fungoLen, 10);
+        rebuildBat();
+      });
+    });
+
+    document.getElementById('btn-add-cart').addEventListener('click', function () {
+      if (window.GibraltarCart) {
+        window.GibraltarCart.add(getCartName(), getPrice());
+      }
+    });
+
+    // ─── Resize ──────────────────────────────────────────────────────────────
+    function onResize() {
+      const panel = document.querySelector('.config-panel');
+      let w, h;
+      if (window.innerWidth > 640) {
+        const wrap = document.querySelector('.config-wrap');
+        w = wrap.clientWidth - panel.offsetWidth;
+        h = wrap.clientHeight;
+      } else {
+        w = window.innerWidth;
+        h = Math.max(320, window.innerWidth * 0.65);
+        canvas.style.height = h + 'px';
+      }
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', onResize);
+    onResize();
+
+    // ─── Render loop ─────────────────────────────────────────────────────────
+    (function loop() {
+      requestAnimationFrame(loop);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+
+    // ─── Color swatches ──────────────────────────────────────────────────────
+    function applyColor(mat, key) {
+      const c = COLORS[key];
+      mat.color.setHex(c.hex);
+      mat.roughness   = c.roughness;
+      mat.metalness   = c.metalness;
+      mat.needsUpdate = true;
+    }
+
+    function buildSwatches(containerId, nameId, mat, initial) {
+      const wrap = document.getElementById(containerId);
+      const lbl  = document.getElementById(nameId);
+      Object.entries(COLORS).forEach(([key, { label }]) => {
+        const btn = document.createElement('button');
+        btn.className     = 'swatch' + (key === initial ? ' active' : '');
+        btn.dataset.color = key;
+        btn.title         = label;
+        btn.addEventListener('click', () => {
+          wrap.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+          btn.classList.add('active');
+          lbl.textContent = label;
+          applyColor(mat, key);
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    buildSwatches('barrel-swatches', 'barrel-name', barrelMat, 'natural');
+    buildSwatches('handle-swatches', 'handle-name', handleMat, 'natural');
+  </script>
+
+  <div class="cart-panel" id="cart-panel">
+    <div class="cart-header">Cart</div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <a href="checkout.html" class="btn-checkout">Check Out</a>
+    </div>
+  </div>
+  <script src="js/cart.js"></script>
+</body>
+</html>
