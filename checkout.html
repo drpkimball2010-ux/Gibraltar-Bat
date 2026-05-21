@@ -378,7 +378,7 @@
           const total      = cart.reduce((s, i) => s + i.price, 0);
 
           const payload = {
-            _subject:      'New Order — Gibraltar Bat',
+            _subject:      'New Order — Gibraltar Bat — ' + new Date().toLocaleString(),
             name:          f['first-name'].value + ' ' + f['last-name'].value,
             email:         f['email'].value,
             phone:         f['phone'].value || '—',
