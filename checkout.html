@@ -389,28 +389,36 @@
           };
 
           btn.disabled = true;
-          btn.textContent = 'Placing Order...';
+          btn.textContent = 'Processing...';
 
-          fetch('https://formspree.io/f/xkoerzdy', {
+          fetch('/api/create-checkout', {
             method:  'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body:    JSON.stringify(payload),
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              items: cart,
+              customer: {
+                name:    payload.name,
+                email:   payload.email,
+                phone:   payload.phone,
+                address: payload.address,
+                notes:   payload.notes,
+              }
+            }),
           })
           .then(function (res) { return res.json(); })
           .then(function (data) {
-            if (data.ok) {
-              localStorage.removeItem(KEY);
-              document.getElementById('confirm-overlay').classList.add('show');
+            if (data.url) {
+              window.location.href = data.url;
             } else {
               btn.disabled = false;
               btn.textContent = 'Place Order';
-              alert('Something went wrong. Please email us directly at support@gibraltarbat.com');
+              alert('Something went wrong. Please email us at support@gibraltarbat.com');
             }
           })
           .catch(function () {
             btn.disabled = false;
             btn.textContent = 'Place Order';
-            alert('Something went wrong. Please email us directly at support@gibraltarbat.com');
+            alert('Something went wrong. Please email us at support@gibraltarbat.com');
           });
         });
       });
