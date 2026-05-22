@@ -7,16 +7,11 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .checkout-wrap {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 3.5rem 2rem 5rem;
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 3rem;
-      align-items: start;
+      max-width: 500px;
+      margin: 5rem auto;
+      padding: 0 2rem 5rem;
     }
 
-    /* ── Order Summary ── */
     .order-summary {
       background: var(--navy);
       color: var(--white);
@@ -41,7 +36,6 @@
       font-size: 0.88rem;
     }
     .summary-item:last-of-type { border-bottom: none; }
-
     .summary-item-name { color: #ddd; }
     .summary-item-price { color: var(--white); font-weight: 700; }
 
@@ -66,73 +60,10 @@
     }
     .summary-total span:last-child { color: var(--gold); font-size: 1.15rem; }
 
-    /* ── Checkout Form ── */
-    .checkout-form h2 {
-      font-size: 1.35rem;
-      color: var(--navy);
-      margin-bottom: 0.4rem;
-    }
-
-    .checkout-form .form-subtitle {
-      font-family: Arial, sans-serif;
-      font-size: 0.82rem;
-      color: #888;
-      margin-bottom: 2rem;
-    }
-
-    .form-section-label {
-      font-family: Arial, sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--navy);
-      margin: 1.6rem 0 0.8rem;
-    }
-    .form-section-label:first-of-type { margin-top: 0; }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .form-field.full { grid-column: 1 / -1; }
-
-    .form-field label {
-      font-family: Arial, sans-serif;
-      font-size: 0.78rem;
-      color: #555;
-    }
-
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-      padding: 0.6rem 0.75rem;
-      border: 1.5px solid #ddd;
-      border-radius: 5px;
-      font-family: Arial, sans-serif;
-      font-size: 0.88rem;
-      color: var(--navy);
-      background: white;
-      transition: border-color 0.15s;
-      outline: none;
-    }
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus { border-color: var(--navy); }
-
-    .form-field textarea { resize: vertical; min-height: 70px; }
-
     .btn-place-order {
       display: block;
       width: 100%;
-      margin-top: 1.8rem;
+      margin-top: 1.4rem;
       padding: 1rem;
       background: var(--navy);
       color: var(--white);
@@ -147,11 +78,7 @@
       transition: background 0.2s, color 0.2s;
     }
     .btn-place-order:hover { background: var(--gold); color: var(--navy); }
-    .btn-place-order:disabled {
-      background: #ccc;
-      color: #888;
-      cursor: not-allowed;
-    }
+    .btn-place-order:disabled { background: #ccc; color: #888; cursor: not-allowed; }
 
     .empty-warning {
       font-family: Arial, sans-serif;
@@ -159,59 +86,6 @@
       color: #cc2200;
       margin-top: 0.6rem;
       display: none;
-    }
-
-    /* Confirmation overlay */
-    .confirm-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(11,26,46,0.82);
-      z-index: 600;
-      align-items: center;
-      justify-content: center;
-    }
-    .confirm-overlay.show { display: flex; }
-
-    .confirm-box {
-      background: white;
-      border-radius: 12px;
-      padding: 3rem 2.5rem;
-      max-width: 420px;
-      width: 90%;
-      text-align: center;
-    }
-    .confirm-box h2 {
-      font-size: 1.5rem;
-      color: var(--navy);
-      margin-bottom: 0.75rem;
-    }
-    .confirm-box p {
-      font-family: Arial, sans-serif;
-      font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-    .confirm-box .btn {
-      display: inline-block;
-      background: var(--navy);
-      color: white;
-      padding: 0.75rem 2rem;
-      border-radius: 5px;
-      text-decoration: none;
-      font-family: Arial, sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: background 0.2s;
-    }
-    .confirm-box .btn:hover { background: var(--gold); color: var(--navy); }
-
-    @media (max-width: 700px) {
-      .checkout-wrap { grid-template-columns: 1fr; gap: 2rem; }
-      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -235,8 +109,6 @@
   </nav>
 
   <div class="checkout-wrap">
-
-    <!-- Order Summary -->
     <div class="order-summary">
       <h2>Order Summary</h2>
       <div id="summary-items"></div>
@@ -245,74 +117,8 @@
         <span id="summary-total">$0</span>
       </div>
     </div>
-
-    <!-- Customer Info Form -->
-    <div class="checkout-form">
-      <h2>Your Information</h2>
-      <p class="form-subtitle">We'll use this to confirm and ship your order.</p>
-
-      <form id="checkout-form">
-
-        <p class="form-section-label">Contact</p>
-        <div class="form-row">
-          <div class="form-field">
-            <label for="first-name">First Name</label>
-            <input type="text" id="first-name" name="first-name" />
-          </div>
-          <div class="form-field">
-            <label for="last-name">Last Name</label>
-            <input type="text" id="last-name" name="last-name" />
-          </div>
-          <div class="form-field">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" />
-          </div>
-          <div class="form-field">
-            <label for="phone">Phone</label>
-            <input type="tel" id="phone" name="phone" />
-          </div>
-        </div>
-
-        <p class="form-section-label">Shipping Address</p>
-        <div class="form-row">
-          <div class="form-field full">
-            <label for="address">Street Address</label>
-            <input type="text" id="address" name="address" />
-          </div>
-          <div class="form-field">
-            <label for="city">City</label>
-            <input type="text" id="city" name="city" />
-          </div>
-          <div class="form-field">
-            <label for="state">State</label>
-            <input type="text" id="state" name="state" maxlength="2" />
-          </div>
-          <div class="form-field">
-            <label for="zip">ZIP Code</label>
-            <input type="text" id="zip" name="zip" maxlength="10" />
-          </div>
-        </div>
-
-        <p class="form-section-label">Order Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.75rem;color:#aaa;">(optional)</span></p>
-        <div class="form-field full">
-          <textarea id="notes" name="notes" placeholder="Length preferences, engravings, or anything else..."></textarea>
-        </div>
-
-        <p class="empty-warning" id="empty-warning">Please add items to your cart before checking out.</p>
-        <button type="submit" class="btn-place-order" id="place-order-btn">Place Order</button>
-
-      </form>
-    </div>
-
-  </div>
-
-  <!-- Confirmation overlay -->
-  <div class="confirm-overlay" id="confirm-overlay">
-    <div class="confirm-box">
-      <h2>Order Received</h2>
-      <p>Thank you for your order. We'll be in touch within 24 hours to confirm details and arrange payment.</p>
-      <a href="index.html" class="btn">Back to Home</a>
-    </div>
+    <p class="empty-warning" id="empty-warning">Please add items to your cart before checking out.</p>
+    <button class="btn-place-order" id="place-order-btn">Proceed to Payment</button>
   </div>
 
   <div class="cart-panel" id="cart-panel">
@@ -338,11 +144,11 @@
       }
 
       function renderSummary() {
-        const cart    = load();
-        const itemsEl = document.getElementById('summary-items');
-        const totalEl = document.getElementById('summary-total');
-        const btn     = document.getElementById('place-order-btn');
-        const warn    = document.getElementById('empty-warning');
+        var cart    = load();
+        var itemsEl = document.getElementById('summary-items');
+        var totalEl = document.getElementById('summary-total');
+        var btn     = document.getElementById('place-order-btn');
+        var warn    = document.getElementById('empty-warning');
 
         if (cart.length === 0) {
           itemsEl.innerHTML = '<p class="summary-empty">Your cart is empty.</p>';
@@ -350,13 +156,10 @@
           btn.disabled = true;
           warn.style.display = 'block';
         } else {
-          itemsEl.innerHTML = cart.map(item =>
-            `<div class="summary-item">
-              <span class="summary-item-name">${item.name}</span>
-              <span class="summary-item-price">$${item.price}</span>
-            </div>`
-          ).join('');
-          const total = cart.reduce((s, i) => s + i.price, 0);
+          itemsEl.innerHTML = cart.map(function (item) {
+            return '<div class="summary-item"><span class="summary-item-name">' + item.name + '</span><span class="summary-item-price">$' + item.price + '</span></div>';
+          }).join('');
+          var total = cart.reduce(function (s, i) { return s + i.price; }, 0);
           totalEl.textContent = '$' + total;
           btn.disabled = false;
           warn.style.display = 'none';
@@ -366,44 +169,18 @@
       document.addEventListener('DOMContentLoaded', function () {
         renderSummary();
 
-        document.getElementById('checkout-form').addEventListener('submit', function (e) {
-          e.preventDefault();
-          const cart = load();
+        document.getElementById('place-order-btn').addEventListener('click', function () {
+          var cart = load();
           if (cart.length === 0) return;
 
-          const btn = document.getElementById('place-order-btn');
-          const f   = document.getElementById('checkout-form');
-
-          const orderLines = cart.map(item => item.name + ' — $' + item.price).join('\n');
-          const total      = cart.reduce((s, i) => s + i.price, 0);
-
-          const payload = {
-            _subject:      'New Order — Gibraltar Bat — ' + new Date().toLocaleString(),
-            name:          f['first-name'].value + ' ' + f['last-name'].value,
-            email:         f['email'].value,
-            phone:         f['phone'].value || '—',
-            address:       f['address'].value + ', ' + f['city'].value + ', ' + f['state'].value + ' ' + f['zip'].value,
-            order_items:   orderLines,
-            order_total:   '$' + total,
-            notes:         f['notes'].value || '—',
-          };
-
+          var btn = document.getElementById('place-order-btn');
           btn.disabled = true;
           btn.textContent = 'Processing...';
 
           fetch('/api/create-checkout', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
-              items: cart,
-              customer: {
-                name:    payload.name,
-                email:   payload.email,
-                phone:   payload.phone,
-                address: payload.address,
-                notes:   payload.notes,
-              }
-            }),
+            body:    JSON.stringify({ items: cart }),
           })
           .then(function (res) { return res.json(); })
           .then(function (data) {
@@ -411,14 +188,14 @@
               window.location.href = data.url;
             } else {
               btn.disabled = false;
-              btn.textContent = 'Place Order';
+              btn.textContent = 'Proceed to Payment';
               alert('Error: ' + (data.error || JSON.stringify(data)));
             }
           })
           .catch(function (err) {
             btn.disabled = false;
-            btn.textContent = 'Place Order';
-            alert('Network error: ' + err.message);
+            btn.textContent = 'Proceed to Payment';
+            alert('Something went wrong. Please email us at support@gibraltarbat.com');
           });
         });
       });
