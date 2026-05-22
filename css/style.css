@@ -43,7 +43,7 @@ img {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0;
 }
 .nav-logo-icon {
   height: 70px;
@@ -674,7 +674,7 @@ footer
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0;
 }
 .nav-logo-icon {
   height: 70px;
@@ -749,7 +749,7 @@ footer p {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0;
 }
 .nav-logo-icon {
   height: 70px;
