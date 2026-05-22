@@ -48,7 +48,7 @@ img {
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(1);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
   margin-top: 3px;
 }
 .nav-logo-text { display: contents; }
@@ -679,7 +679,7 @@ footer
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(1);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
 }
 .nav-logo-text { display: contents; }
 
@@ -754,7 +754,7 @@ footer p {
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(1);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
 }
 .nav-logo-text { display: contents; }
 
