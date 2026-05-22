@@ -55,10 +55,10 @@ img {
 
 .footer-logo-icon {
   display: block;
-  height: 40px;
+  height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(1) brightness(0.75);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
 }
 
 nav {
@@ -685,10 +685,10 @@ footer
 
 .footer-logo-icon {
   display: block;
-  height: 40px;
+  height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(1) brightness(0.75);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
 }
 
 footer nav {
@@ -760,10 +760,10 @@ footer p {
 
 .footer-logo-icon {
   display: block;
-  height: 40px;
+  height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(1) brightness(0.75);
+  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
 }
 
 nav { position: relative; }
