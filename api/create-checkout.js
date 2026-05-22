@@ -8,7 +8,7 @@ module.exports = async function (req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const key = process.env.SECRET_STRIPE_KEY;
+  const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
     return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY env var' });
   }
@@ -36,13 +36,6 @@ module.exports = async function (req, res) {
     params[`line_items[${i}][price_data][unit_amount]`] = Math.round(item.price * 100);
     params[`line_items[${i}][quantity]`] = 1;
   });
-
-  // Append flat-rate shipping as a line item
-  const i = items.length;
-  params[`line_items[${i}][price_data][currency]`] = 'usd';
-  params[`line_items[${i}][price_data][product_data][name]`] = 'Shipping';
-  params[`line_items[${i}][price_data][unit_amount]`] = 1500;
-  params[`line_items[${i}][quantity]`] = 1;
 
   const body = querystring.stringify(params);
 

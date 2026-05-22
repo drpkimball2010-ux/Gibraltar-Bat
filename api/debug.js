@@ -1,5 +1,5 @@
 module.exports = function (req, res) {
-  const key = process.env.SECRET_STRIPE_KEY;
+  const key = process.env.STRIPE_SECRET_KEY;
   res.status(200).json({
     has_key: !!key,
     key_length: key ? key.length : 0,
