@@ -412,13 +412,13 @@
             } else {
               btn.disabled = false;
               btn.textContent = 'Place Order';
-              alert('Something went wrong. Please email us at support@gibraltarbat.com');
+              alert('Error: ' + (data.error || JSON.stringify(data)));
             }
           })
-          .catch(function () {
+          .catch(function (err) {
             btn.disabled = false;
             btn.textContent = 'Place Order';
-            alert('Something went wrong. Please email us at support@gibraltarbat.com');
+            alert('Network error: ' + err.message);
           });
         });
       });
