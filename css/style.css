@@ -686,7 +686,7 @@ footer
   filter: invert(1) brightness(0.75);
 }
 
-nav {
+footer nav {
   background: none;
   position: static;
   height: auto;
