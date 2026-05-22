@@ -23,22 +23,26 @@ module.exports = async function (req, res) {
       quantity: 1,
     }));
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      customer_email: customer.email,
-      shipping_address_collection: { allowed_countries: ['US'] },
+      shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'AU'] },
       metadata: {
-        customer_name:    customer.name,
-        customer_phone:   customer.phone,
-        customer_address: customer.address,
-        notes:            customer.notes || '',
+        customer_name:    customer.name    || '',
+        customer_phone:   customer.phone   || '',
+        customer_address: customer.address || '',
+        notes:            customer.notes   || '',
       },
       success_url: 'https://gibraltarbat.com/success.html',
       cancel_url:  'https://gibraltarbat.com/checkout.html',
-    });
+    };
 
+    if (customer.email) {
+      sessionParams.customer_email = customer.email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
     return res.status(200).json({ url: session.url });
 
   } catch (err) {
