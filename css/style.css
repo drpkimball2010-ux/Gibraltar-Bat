@@ -48,7 +48,7 @@ img {
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
   margin-top: 3px;
 }
 .nav-logo-text { display: contents; }
@@ -58,7 +58,7 @@ img {
   height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
 }
 
 nav {
@@ -679,7 +679,7 @@ footer
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
 }
 .nav-logo-text { display: contents; }
 
@@ -688,7 +688,7 @@ footer
   height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
 }
 
 footer nav {
@@ -754,7 +754,7 @@ footer p {
 .nav-logo-icon {
   height: 70px;
   width: auto;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
 }
 .nav-logo-text { display: contents; }
 
@@ -763,7 +763,7 @@ footer p {
   height: 80px;
   width: auto;
   margin: 0 auto 0.5rem;
-  filter: invert(74%) sepia(57%) saturate(589%) hue-rotate(4deg) brightness(96%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(75%) sepia(40%) saturate(742%) hue-rotate(4deg) brightness(96%) contrast(90%);
 }
 
 nav { position: relative; }
