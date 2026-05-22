@@ -115,7 +115,7 @@ nav {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
   color: var(--white);
   text-align: center;
-  padding: 6rem 2rem;
+  padding: 6rem 2rem 4rem;
   position: relative;
   overflow: hidden;
 }
