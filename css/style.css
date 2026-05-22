@@ -42,13 +42,14 @@ img {
 
 .nav-logo {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.5rem;
 }
 .nav-logo-icon {
   height: 70px;
   width: auto;
   filter: invert(1);
+  margin-top: 8px;
 }
 .nav-logo-text { display: contents; }
 
