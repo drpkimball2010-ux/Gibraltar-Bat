@@ -672,7 +672,7 @@ footer
   gap: 0.5rem;
 }
 .nav-logo-icon {
-  height: 32px;
+  height: 48px;
   width: auto;
   filter: invert(1);
 }
@@ -747,7 +747,7 @@ footer p {
   gap: 0.5rem;
 }
 .nav-logo-icon {
-  height: 32px;
+  height: 48px;
   width: auto;
   filter: invert(1);
 }
