@@ -112,6 +112,14 @@
     <div class="order-summary">
       <h2>Order Summary</h2>
       <div id="summary-items"></div>
+      <div class="summary-total" style="border-top:1px solid rgba(255,255,255,0.15); margin-top:0.8rem; padding-top:0.8rem; font-size:0.85rem; font-weight:400; color:#aaa;">
+        <span>Subtotal</span>
+        <span id="summary-subtotal">$0</span>
+      </div>
+      <div class="summary-total" style="border-top:1px solid rgba(255,255,255,0.15); margin-top:0; padding-top:0.8rem; font-size:0.85rem; font-weight:400; color:#aaa;">
+        <span>Shipping</span>
+        <span>$15</span>
+      </div>
       <div class="summary-total">
         <span>Total</span>
         <span id="summary-total">$0</span>
@@ -152,6 +160,7 @@
 
         if (cart.length === 0) {
           itemsEl.innerHTML = '<p class="summary-empty">Your cart is empty.</p>';
+          document.getElementById('summary-subtotal').textContent = '$0';
           totalEl.textContent = '$0';
           btn.disabled = true;
           warn.style.display = 'block';
@@ -159,8 +168,9 @@
           itemsEl.innerHTML = cart.map(function (item) {
             return '<div class="summary-item"><span class="summary-item-name">' + item.name + '</span><span class="summary-item-price">$' + item.price + '</span></div>';
           }).join('');
-          var total = cart.reduce(function (s, i) { return s + i.price; }, 0);
-          totalEl.textContent = '$' + total;
+          var subtotal = cart.reduce(function (s, i) { return s + i.price; }, 0);
+          document.getElementById('summary-subtotal').textContent = '$' + subtotal;
+          totalEl.textContent = '$' + (subtotal + 15);
           btn.disabled = false;
           warn.style.display = 'none';
         }
