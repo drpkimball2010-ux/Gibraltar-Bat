@@ -57,7 +57,7 @@ img {
   display: block;
   height: 100px;
   width: auto;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0;
 
 }
 
@@ -687,7 +687,7 @@ footer
   display: block;
   height: 100px;
   width: auto;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0;
 
 }
 
@@ -762,7 +762,7 @@ footer p {
   display: block;
   height: 100px;
   width: auto;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0;
 
 }
 
