@@ -571,6 +571,7 @@ section {
 .contact-info-item p {
   font-size: 0.9rem;
   color: #ccc;
+  word-break: break-all;
 }
 
 /* ===== SHOP PAGE ===== */
