@@ -628,6 +628,37 @@ section {
   margin-bottom: 1rem;
 }
 
+.wood-options {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.wood-btn {
+  flex: 1;
+  padding: 0.35rem 0.4rem;
+  border: 1.5px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.wood-btn:hover { border-color: var(--navy); }
+.wood-btn.active {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+}
+.wood-btn[data-wood="Pro Reserve"].active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+
 .size-btn {
   flex: 1;
   padding: 0.35rem 0.1rem;

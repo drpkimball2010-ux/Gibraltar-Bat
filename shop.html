@@ -41,6 +41,10 @@
         Secure checkout powered by Stripe — your payment info is never stored on this site.
       </div>
 
+      <div style="background: #fff8e6; border-left: 4px solid var(--gold); border-radius: 6px; padding: 0.9rem 1.2rem; margin-bottom: 1.5rem; font-family: Arial, sans-serif; font-size: 0.85rem; color: #555;">
+        <strong style="color: var(--navy);">Made to Order:</strong> All bats are handcrafted to order — please allow 4–5 weeks for production and delivery.
+      </div>
+
       <p style="font-family: Arial, sans-serif; font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 2rem;">All bats (besides fungo) will fall somewhere in the neighborhood of a −3 to −2 drop weight.</p>
 
       <!-- CUSTOM ORDER CALLOUT -->
@@ -63,6 +67,10 @@
           <div class="product-info">
             <h3>Maple — Standard</h3>
             <p class="product-desc">Hard maple with dense grain and maximum pop. Stiff feel on contact, built for power hitters who turn on fastballs.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -70,7 +78,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$130</span>
+              <span class="price" data-base-price="130">$130</span>
               <button class="btn-buy btn-buy-sized" data-name="Maple — Standard" data-price="130">Add to Cart</button>
             </div>
           </div>
@@ -81,6 +89,10 @@
           <div class="product-info">
             <h3>Birch — Standard</h3>
             <p class="product-desc">Yellow birch with a firm feel and flex similar to ash. Durable, forgiving on mishits, and great for all-around hitters.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="120">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -88,7 +100,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$120</span>
+              <span class="price" data-base-price="120">$120</span>
               <button class="btn-buy btn-buy-sized" data-name="Birch — Standard" data-price="120">Add to Cart</button>
             </div>
           </div>
@@ -99,6 +111,10 @@
           <div class="product-info">
             <h3>Ash — Standard</h3>
             <p class="product-desc">Northern white ash with natural flex and a traditional feel. Lightweight swing weight and responsive grain for contact hitters.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="70">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -106,7 +122,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$70</span>
+              <span class="price" data-base-price="70">$70</span>
               <button class="btn-buy btn-buy-sized" data-name="Ash — Standard" data-price="70">Add to Cart</button>
             </div>
           </div>
@@ -123,6 +139,10 @@
           <div class="product-info">
             <h3>Maple — Torpedo</h3>
             <p class="product-desc">Hard maple density meets the torpedo shape. Maximum mass at the sweet spot — built for hitters who want every edge at the plate.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -130,7 +150,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$130</span>
+              <span class="price" data-base-price="130">$130</span>
               <button class="btn-buy btn-buy-sized" data-name="Maple — Torpedo" data-price="130">Add to Cart</button>
             </div>
           </div>
@@ -141,6 +161,10 @@
           <div class="product-info">
             <h3>Birch — Torpedo</h3>
             <p class="product-desc">Birch construction with the torpedo barrel profile — weight pushed toward the sweet spot for increased contact power.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="120">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -148,7 +172,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$120</span>
+              <span class="price" data-base-price="120">$120</span>
               <button class="btn-buy btn-buy-sized" data-name="Birch — Torpedo" data-price="120">Add to Cart</button>
             </div>
           </div>
@@ -159,6 +183,10 @@
           <div class="product-info">
             <h3>Ash — Torpedo</h3>
             <p class="product-desc">Ash flex paired with a torpedo barrel. Lighter swing, more barrel in the zone, designed to put the ball in play hard.</p>
+            <div class="wood-options">
+              <button class="wood-btn active" data-wood="Standard" data-price="70">Standard</button>
+              <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+            </div>
             <div class="size-options">
               <button class="size-btn" data-size="30">30"</button>
               <button class="size-btn" data-size="31">31"</button>
@@ -166,7 +194,7 @@
               <button class="size-btn active" data-size="33">33"</button>
             </div>
             <div class="product-footer">
-              <span class="price">$70</span>
+              <span class="price" data-base-price="70">$70</span>
               <button class="btn-buy btn-buy-sized" data-name="Ash — Torpedo" data-price="70">Add to Cart</button>
             </div>
           </div>
@@ -229,7 +257,9 @@
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.product-card').forEach(function (card) {
         var sizeBtns = card.querySelectorAll('.size-btn');
-        if (!sizeBtns.length) return;
+        var woodBtns = card.querySelectorAll('.wood-btn');
+        var buyBtn   = card.querySelector('.btn-buy-sized');
+        var priceEl  = card.querySelector('.price');
 
         sizeBtns.forEach(function (btn) {
           btn.addEventListener('click', function () {
@@ -238,13 +268,25 @@
           });
         });
 
-        var buyBtn = card.querySelector('.btn-buy-sized');
+        woodBtns.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            woodBtns.forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var price = btn.dataset.price;
+            if (buyBtn) buyBtn.dataset.price = price;
+            if (priceEl) priceEl.textContent = '$' + price;
+          });
+        });
+
         if (!buyBtn) return;
         buyBtn.addEventListener('click', function () {
-          var active = card.querySelector('.size-btn.active');
-          var size = active ? active.dataset.size : '33';
+          var activeSize = card.querySelector('.size-btn.active');
+          var activeWood = card.querySelector('.wood-btn.active');
+          var size = activeSize ? activeSize.dataset.size : '33';
+          var wood = activeWood ? activeWood.dataset.wood : 'Standard';
+          var name = buyBtn.dataset.name + (wood === 'Pro Reserve' ? ' (Pro Reserve)' : '') + ' ' + size + '"';
           if (window.GibraltarCart) {
-            window.GibraltarCart.add(buyBtn.dataset.name + ' ' + size + '"', Number(buyBtn.dataset.price));
+            window.GibraltarCart.add(name, Number(buyBtn.dataset.price));
           }
         });
       });
