@@ -746,16 +746,14 @@ footer p {
 /* ── Mobile nav ────────────────────────────────────────────────── */
 
 @media (max-width: 700px) {
-  
+
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 0;
 }
 .nav-logo-icon {
-  height: 70px;
-  width: auto;
-
+  display: none;
 }
 .nav-logo-text { display: contents; }
 
