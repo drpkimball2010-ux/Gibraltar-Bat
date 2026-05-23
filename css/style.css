@@ -745,7 +745,7 @@ footer p {
 
 /* ── Mobile nav ────────────────────────────────────────────────── */
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 
 .nav-logo {
   display: flex;
@@ -812,7 +812,7 @@ nav { position: relative; padding: 0 1rem 0 0.75rem; }
 }
 .cart-btn:hover { color: var(--gold); }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .cart-btn { margin-left: 0.3rem; }
 }
 
