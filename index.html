@@ -86,6 +86,10 @@
         <div class="product-info">
           <h3>Maple — Standard</h3>
           <p class="product-desc">Hard maple with dense grain and maximum pop. Stiff feel on contact, built for power hitters who turn on fastballs.</p>
+          <div class="wood-options">
+            <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
+            <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+          </div>
           <div class="size-options">
             <button class="size-btn" data-size="30">30"</button>
             <button class="size-btn" data-size="31">31"</button>
@@ -93,7 +97,7 @@
             <button class="size-btn active" data-size="33">33"</button>
           </div>
           <div class="product-footer">
-            <span class="price">$130</span>
+            <span class="price" data-base-price="130">$130</span>
             <button class="btn-buy btn-buy-sized" data-name="Maple — Standard" data-price="130">Add to Cart</button>
           </div>
         </div>
@@ -104,6 +108,10 @@
         <div class="product-info">
           <h3>Maple — Torpedo</h3>
           <p class="product-desc">Hard maple density meets the torpedo shape. Maximum mass at the sweet spot — built for hitters who want every edge at the plate.</p>
+          <div class="wood-options">
+            <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
+            <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
+          </div>
           <div class="size-options">
             <button class="size-btn" data-size="30">30"</button>
             <button class="size-btn" data-size="31">31"</button>
@@ -111,7 +119,7 @@
             <button class="size-btn active" data-size="33">33"</button>
           </div>
           <div class="product-footer">
-            <span class="price">$130</span>
+            <span class="price" data-base-price="130">$130</span>
             <button class="btn-buy btn-buy-sized" data-name="Maple — Torpedo" data-price="130">Add to Cart</button>
           </div>
         </div>
@@ -135,8 +143,9 @@
       </div>
 
     </div>
-    <div style="text-align:center; margin-top: 2.5rem;">
+    <div style="text-align:center; margin-top: 2.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
       <a href="shop.html" class="btn btn-primary">View All Bats</a>
+      <a href="customize.html" class="btn btn-secondary">Design a Custom Bat</a>
     </div>
   </section>
 
@@ -168,7 +177,9 @@
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.product-card').forEach(function (card) {
         var sizeBtns = card.querySelectorAll('.size-btn');
-        if (!sizeBtns.length) return;
+        var woodBtns = card.querySelectorAll('.wood-btn');
+        var buyBtn   = card.querySelector('.btn-buy-sized');
+        var priceEl  = card.querySelector('.price');
 
         sizeBtns.forEach(function (btn) {
           btn.addEventListener('click', function () {
@@ -177,13 +188,25 @@
           });
         });
 
-        var buyBtn = card.querySelector('.btn-buy-sized');
+        woodBtns.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            woodBtns.forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var price = btn.dataset.price;
+            if (buyBtn) buyBtn.dataset.price = price;
+            if (priceEl) priceEl.textContent = '$' + price;
+          });
+        });
+
         if (!buyBtn) return;
         buyBtn.addEventListener('click', function () {
-          var active = card.querySelector('.size-btn.active');
-          var size = active ? active.dataset.size : '33';
+          var activeSize = card.querySelector('.size-btn.active');
+          var activeWood = card.querySelector('.wood-btn.active');
+          var size = activeSize ? activeSize.dataset.size : '33';
+          var wood = activeWood ? activeWood.dataset.wood : 'Standard';
+          var name = buyBtn.dataset.name + (wood === 'Pro Reserve' ? ' (Pro Reserve)' : '') + ' ' + size + '"';
           if (window.GibraltarCart) {
-            window.GibraltarCart.add(buyBtn.dataset.name + ' ' + size + '"', Number(buyBtn.dataset.price));
+            window.GibraltarCart.add(name, Number(buyBtn.dataset.price));
           }
         });
       });
