@@ -765,7 +765,7 @@ footer p {
 
 }
 
-nav { position: relative; }
+nav { position: relative; padding: 0 1rem 0 0.75rem; }
 
   .nav-hamburger { display: flex; }
 
