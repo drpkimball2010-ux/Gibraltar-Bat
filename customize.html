@@ -250,6 +250,7 @@
           <button class="len-btn active" data-grade="standard">Standard</button>
           <button class="len-btn" data-grade="proreserve">Pro Reserve</button>
         </div>
+        <p id="standard-note" style="display:block; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Custom bats ship within 2–3 weeks.</p>
         <p id="pro-reserve-note" style="display:none; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Made to order — allow 4–5 weeks for delivery.</p>
       </div>
 
@@ -784,8 +785,8 @@
         btn.classList.add('active');
         grade = btn.dataset.grade;
         updatePrice();
-        const note = document.getElementById('pro-reserve-note');
-        if (note) note.style.display = grade === 'proreserve' ? 'block' : 'none';
+        document.getElementById('standard-note').style.display = grade === 'proreserve' ? 'none' : 'block';
+        document.getElementById('pro-reserve-note').style.display = grade === 'proreserve' ? 'block' : 'none';
       });
     });
 
