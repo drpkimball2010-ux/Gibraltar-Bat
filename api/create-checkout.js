@@ -37,6 +37,13 @@ module.exports = async function (req, res) {
     params[`line_items[${i}][quantity]`] = 1;
   });
 
+  // Flat-rate shipping
+  const s = items.length;
+  params[`line_items[${s}][price_data][currency]`] = 'usd';
+  params[`line_items[${s}][price_data][product_data][name]`] = 'Shipping';
+  params[`line_items[${s}][price_data][unit_amount]`] = 1500;
+  params[`line_items[${s}][quantity]`] = 1;
+
   const body = querystring.stringify(params);
 
   const result = await new Promise((resolve, reject) => {

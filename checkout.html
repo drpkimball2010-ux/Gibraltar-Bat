@@ -247,6 +247,10 @@
     <div class="order-summary">
       <h2>Order Summary</h2>
       <div id="summary-items"></div>
+      <div class="summary-item" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0.65rem 0;">
+        <span class="summary-item-name">Shipping (flat rate)</span>
+        <span class="summary-item-price">$15</span>
+      </div>
       <div class="summary-total">
         <span>Total</span>
         <span id="summary-total">$0</span>
@@ -315,7 +319,7 @@
               <span class="summary-item-price">$${item.price}</span>
             </div>`
           ).join('');
-          const total = cart.reduce((s, i) => s + i.price, 0);
+          const total = cart.reduce((s, i) => s + i.price, 0) + 15;
           totalEl.textContent = '$' + total;
           btn.disabled = false;
           warn.style.display = 'none';
