@@ -5,6 +5,16 @@
   padding: 0;
 }
 
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input, textarea, select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 :root {
   --navy: #0d1b2a;
   --navy-light: #1b2d42;
