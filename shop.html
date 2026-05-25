@@ -6,6 +6,34 @@
   <title>Shop — Gibraltar Bat</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="stylesheet" href="css/style.css" />
+  <script defer src="/_vercel/insights/script.js"></script>
+  <style>
+    .quiz-opt {
+      display: block;
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 7px;
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.5rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.85rem;
+      color: var(--white);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .quiz-opt:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.3); }
+    .quiz-opt.selected { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 700; }
+    .wood-guide-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .wood-guide-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -33,8 +61,100 @@
     <p>Every bat Gibraltar makes — built for every player, every level.</p>
   </section>
 
+  <!-- WOOD FINDER -->
+  <section style="background: #f4f2ef; padding: 5rem 2rem;">
+    <div style="max-width: 920px; margin: 0 auto;">
+
+      <div class="section-title">
+        <h2>Find Your Wood</h2>
+        <div class="underline"></div>
+        <p>Answer three quick questions and we'll point you in the right direction — or scroll down for the full breakdown.</p>
+      </div>
+
+      <!-- QUIZ -->
+      <div style="background: var(--navy); border-radius: 14px; padding: 2.5rem 2.5rem 2rem; margin-bottom: 3.5rem; color: var(--white);">
+        <p style="font-family:Arial,sans-serif; font-size:0.72rem; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; font-weight:700;">Wood Finder Quiz</p>
+
+        <div style="margin-bottom:1.6rem;">
+          <p style="font-family:Arial,sans-serif; font-size:0.88rem; font-weight:700; margin-bottom:0.75rem;">1. What best describes your hitting style?</p>
+          <button class="quiz-opt" data-q="1" data-val="maple">Power — I drive the ball and look to go deep</button>
+          <button class="quiz-opt" data-q="1" data-val="ash">Contact — I use the whole field and put it in play</button>
+          <button class="quiz-opt" data-q="1" data-val="birch">All-around — I do a bit of everything</button>
+        </div>
+
+        <div style="margin-bottom:1.6rem;">
+          <p style="font-family:Arial,sans-serif; font-size:0.88rem; font-weight:700; margin-bottom:0.75rem;">2. What feel do you prefer at the plate?</p>
+          <button class="quiz-opt" data-q="2" data-val="maple">Stiff — solid feedback every time I make contact</button>
+          <button class="quiz-opt" data-q="2" data-val="ash">Flexible — I want some whip and a faster feel</button>
+          <button class="quiz-opt" data-q="2" data-val="birch">Somewhere in between</button>
+        </div>
+
+        <div style="margin-bottom:1.8rem;">
+          <p style="font-family:Arial,sans-serif; font-size:0.88rem; font-weight:700; margin-bottom:0.75rem;">3. What matters most to you in a bat?</p>
+          <button class="quiz-opt" data-q="3" data-val="maple">Durability — I want it to hold up game after game</button>
+          <button class="quiz-opt" data-q="3" data-val="ash">Bat speed — lighter feel, faster hands through the zone</button>
+          <button class="quiz-opt" data-q="3" data-val="birch">Forgiveness — great on mishits, not just the sweet spot</button>
+        </div>
+
+        <button id="quiz-btn" disabled style="display:block; margin:0 auto; padding:0.75rem 2.5rem; background:var(--gold); color:var(--navy); border:none; border-radius:6px; font-family:Arial,sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; opacity:0.45; transition:opacity 0.2s;">Find My Wood</button>
+
+        <div id="quiz-result" style="display:none; margin-top:1.8rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.15); text-align:center;">
+          <p style="font-family:Arial,sans-serif; font-size:0.72rem; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); margin-bottom:0.5rem; font-weight:700;">Your Result</p>
+          <h3 id="quiz-result-title" style="font-size:1.8rem; margin-bottom:0.6rem;"></h3>
+          <p id="quiz-result-desc" style="font-family:Arial,sans-serif; font-size:0.88rem; color:#ccc; max-width:420px; margin:0 auto 1.25rem; line-height:1.65;"></p>
+          <a id="quiz-result-link" href="#products-section" style="display:inline-block; padding:0.65rem 1.8rem; background:var(--gold); color:var(--navy); border-radius:5px; font-family:Arial,sans-serif; font-size:0.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-decoration:none;"></a>
+        </div>
+      </div>
+
+      <!-- WOOD GUIDE -->
+      <p style="font-family:Arial,sans-serif; font-size:0.7rem; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--navy); text-align:center; margin-bottom:1.5rem;">The Wood Guide</p>
+      <div class="wood-guide-grid">
+
+        <div style="background:white; border-radius:10px; padding:1.8rem 1.5rem; border-top:4px solid var(--navy);">
+          <h3 style="font-size:1.1rem; color:var(--navy); margin-bottom:0.3rem;">Maple</h3>
+          <p style="font-family:Arial,sans-serif; font-size:0.72rem; color:var(--gold); font-weight:700; letter-spacing:1px; margin-bottom:1rem; text-transform:uppercase;">Hardest &middot; Densest &middot; Most Pop</p>
+          <p style="font-family:Arial,sans-serif; font-size:0.84rem; color:#444; line-height:1.65; margin-bottom:1rem;">Hard maple has a tight, closed grain that produces a stiff, explosive feel on contact. Maximum energy transfer — every well-hit ball feels like a rocket.</p>
+          <ul style="font-family:Arial,sans-serif; font-size:0.82rem; color:#555; line-height:1.9; padding-left:1.1rem; margin:0;">
+            <li>Stiff, solid feel at impact</li>
+            <li>Dense grain = more pop</li>
+            <li>Closed grain resists flaking</li>
+            <li>Most durable of the three</li>
+            <li>Best for: power hitters</li>
+          </ul>
+        </div>
+
+        <div style="background:white; border-radius:10px; padding:1.8rem 1.5rem; border-top:4px solid var(--gold);">
+          <h3 style="font-size:1.1rem; color:var(--navy); margin-bottom:0.3rem;">Birch</h3>
+          <p style="font-family:Arial,sans-serif; font-size:0.72rem; color:var(--gold); font-weight:700; letter-spacing:1px; margin-bottom:1rem; text-transform:uppercase;">Flexible &middot; Forgiving &middot; All-Around</p>
+          <p style="font-family:Arial,sans-serif; font-size:0.84rem; color:#444; line-height:1.65; margin-bottom:1rem;">New England sourced birch sits between maple and ash. It flexes slightly on contact — forgiving on mishits — and hardens over time with use, so it actually gets better.</p>
+          <ul style="font-family:Arial,sans-serif; font-size:0.82rem; color:#555; line-height:1.9; padding-left:1.1rem; margin:0;">
+            <li>Slight flex, forgiving sweet spot</li>
+            <li>Hardens and improves with use</li>
+            <li>Great for transitioning from aluminum</li>
+            <li>Best for: all-around hitters</li>
+          </ul>
+        </div>
+
+        <div style="background:white; border-radius:10px; padding:1.8rem 1.5rem; border-top:4px solid #999;">
+          <h3 style="font-size:1.1rem; color:var(--navy); margin-bottom:0.3rem;">Ash</h3>
+          <p style="font-family:Arial,sans-serif; font-size:0.72rem; color:#888; font-weight:700; letter-spacing:1px; margin-bottom:1rem; text-transform:uppercase;">Lightest &middot; Most Flex &middot; Traditional</p>
+          <p style="font-family:Arial,sans-serif; font-size:0.84rem; color:#444; line-height:1.65; margin-bottom:1rem;">Northern white ash is the classic wood bat material. The most flexible of the three — a whippy, traditional feel that helps generate bat speed and keeps the barrel in the zone longer.</p>
+          <ul style="font-family:Arial,sans-serif; font-size:0.82rem; color:#555; line-height:1.9; padding-left:1.1rem; margin:0;">
+            <li>Lightest swing weight</li>
+            <li>Natural flex = whippy feel</li>
+            <li>Open grain, traditional look</li>
+            <li>Best for: contact &amp; gap hitters</li>
+          </ul>
+        </div>
+
+      </div>
+      <p style="font-family:Arial,sans-serif; font-size:0.78rem; color:#aaa; text-align:center; margin-top:1.25rem;">All three woods available in Standard and Pro Reserve grades.</p>
+
+    </div>
+  </section>
+
   <!-- PRODUCTS -->
-  <section style="padding: 4rem 2rem;">
+  <section id="products-section" style="padding: 4rem 2rem;">
     <div class="shop-section">
 
       <div class="stripe-notice">
@@ -308,5 +428,68 @@
     });
   </script>
   <script src="js/cart.js"></script>
+  <script>
+    (function () {
+      var scores = { maple: 0, birch: 0, ash: 0 };
+      var answered = {};
+
+      var RESULTS = {
+        maple: {
+          title: 'Maple',
+          desc: 'You want power, solid feedback, and a bat that lasts. Hard maple is your wood — dense grain, stiff feel, and maximum pop on every ball you square up.',
+        },
+        birch: {
+          title: 'Birch',
+          desc: 'You want a forgiving, all-around bat with a balanced feel. New England birch is your match — it flexes where you need it and holds up game after game.',
+        },
+        ash: {
+          title: 'Ash',
+          desc: 'You\'re a contact hitter who values bat speed and a traditional feel. Northern white ash gives you the flex and whip to put the ball exactly where you want it.',
+        },
+      };
+
+      document.querySelectorAll('.quiz-opt').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var q   = btn.dataset.q;
+          var val = btn.dataset.val;
+
+          document.querySelectorAll('.quiz-opt[data-q="' + q + '"]').forEach(function (b) {
+            if (b.classList.contains('selected')) {
+              scores[b.dataset.val] -= 1;
+              b.classList.remove('selected');
+            }
+          });
+
+          btn.classList.add('selected');
+          scores[val] += 1;
+          answered[q] = true;
+
+          var quizBtn = document.getElementById('quiz-btn');
+          if (answered['1'] && answered['2'] && answered['3']) {
+            quizBtn.disabled = false;
+            quizBtn.style.opacity = '1';
+            quizBtn.style.cursor = 'pointer';
+          }
+        });
+      });
+
+      document.getElementById('quiz-btn').addEventListener('click', function () {
+        var winner = 'birch';
+        var max = -1;
+        ['maple', 'birch', 'ash'].forEach(function (w) {
+          if (scores[w] > max) { max = scores[w]; winner = w; }
+        });
+
+        var r = RESULTS[winner];
+        document.getElementById('quiz-result-title').textContent = r.title;
+        document.getElementById('quiz-result-desc').textContent  = r.desc;
+        var link = document.getElementById('quiz-result-link');
+        link.textContent = 'Shop ' + r.title + ' Bats';
+        var resultEl = document.getElementById('quiz-result');
+        resultEl.style.display = 'block';
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    })();
+  </script>
 </body>
 </html>
