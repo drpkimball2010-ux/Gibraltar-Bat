@@ -511,8 +511,11 @@
       const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
 
+      // Ease-in curve: taper stays slender near handle, flares smoothly into barrel
+      const taperR = t => HANDLE_R + Math.pow(t, 1.8) * (BR - HANDLE_R);
+
       const tPaint = (yPaint - yHandleEnd) / tl;
-      const rPaint = HANDLE_R + tPaint * (BR - HANDLE_R);
+      const rPaint = taperR(tPaint);
 
       const mid = yTopFace / 2;
       const S = SCALE;
@@ -528,17 +531,17 @@
         v(HANDLE_R, yHandleEnd),
       ];
 
-      for (let i = 1; i <= 3; i++) {
-        const t = (i / 4) * tPaint;
-        hPts.push(v(HANDLE_R + t * (BR - HANDLE_R), yHandleEnd + t * tl));
+      for (let i = 1; i <= 6; i++) {
+        const t = (i / 7) * tPaint;
+        hPts.push(v(taperR(t), yHandleEnd + t * tl));
       }
       hPts.push(v(rPaint, yPaint));
 
       const bPts = [v(rPaint, yPaint)];
 
-      for (let i = 1; i <= 3; i++) {
-        const t = tPaint + (i / 4) * (1 - tPaint);
-        bPts.push(v(HANDLE_R + t * (BR - HANDLE_R), yHandleEnd + t * tl));
+      for (let i = 1; i <= 6; i++) {
+        const t = tPaint + (i / 7) * (1 - tPaint);
+        bPts.push(v(taperR(t), yHandleEnd + t * tl));
       }
       bPts.push(v(BR, yTaperEnd));
       bPts.push(v(BR, yBarrelEnd));
