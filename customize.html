@@ -194,6 +194,7 @@
       }
     }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -496,9 +497,10 @@
 
     // ─── Standard bat geometry ───────────────────────────────────────────────
     function rebuildStandard(length) {
-      const hl = 12;
-      const bl =  6;
-      const tl = length - KNOB_H - hl - bl - BEVEL_H;
+      const BR = 1.25;                       // 2.5" diameter barrel radius
+      const bl = 8;                          // barrel 8" long
+      const tl = 12 * (length / 33);        // taper 12" at 33", proportional
+      const hl = length - KNOB_H - tl - bl - BEVEL_H;
 
       const yKnobEnd   = KNOB_H;
       const yHandleEnd = yKnobEnd   + hl;
@@ -510,16 +512,16 @@
       const yPaint      = yTopFace - PAINT_DEPTH;
 
       const tPaint = (yPaint - yHandleEnd) / tl;
-      const rPaint = HANDLE_R + tPaint * (BARREL_R - HANDLE_R);
+      const rPaint = HANDLE_R + tPaint * (BR - HANDLE_R);
 
       const mid = yTopFace / 2;
       const S = SCALE;
       const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
 
       const hPts = [
-        v(0.85, 0),        // flat knob bottom edge
-        v(0.85, 0.333),    // top of 1/3" flat section
-        v(0.80, 0.600),    // taper begins
+        v(0.85, 0),
+        v(0.85, 0.333),
+        v(0.80, 0.600),
         v(0.72, 0.900),
         v(0.63, 1.200),
         v(HANDLE_R, yKnobEnd),
@@ -528,7 +530,7 @@
 
       for (let i = 1; i <= 3; i++) {
         const t = (i / 4) * tPaint;
-        hPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+        hPts.push(v(HANDLE_R + t * (BR - HANDLE_R), yHandleEnd + t * tl));
       }
       hPts.push(v(rPaint, yPaint));
 
@@ -536,20 +538,20 @@
 
       for (let i = 1; i <= 3; i++) {
         const t = tPaint + (i / 4) * (1 - tPaint);
-        bPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
+        bPts.push(v(HANDLE_R + t * (BR - HANDLE_R), yHandleEnd + t * tl));
       }
-      bPts.push(v(BARREL_R, yTaperEnd));
-      bPts.push(v(BARREL_R, yBarrelEnd));
+      bPts.push(v(BR, yTaperEnd));
+      bPts.push(v(BR, yBarrelEnd));
 
       for (let i = 1; i <= 6; i++) {
         const theta = (Math.PI / 2) * (i / 6);
         bPts.push(v(
-          (BARREL_R - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
+          (BR - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
           yBarrelEnd + BEVEL_H * Math.sin(theta)
         ));
       }
 
-      const capR = (BARREL_R - BEVEL_IN) * S;
+      const capR = (BR - BEVEL_IN) * S;
       const capY = (yTopFace - mid) * S;
 
       handleMesh.geometry.dispose();
