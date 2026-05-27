@@ -367,56 +367,30 @@
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#C8A96E';
       ctx.fillRect(0, 0, 4, 512);
-      // Hand-placed positions with irregular gaps for a natural flame-burned look
-      const rings = [
-        { y:  9, w: 3, a: 0.50 },
-        { y: 21, w: 5, a: 0.60 },
-        { y: 34, w: 3, a: 0.45 },
-        { y: 50, w: 4, a: 0.55 },
-        { y: 60, w: 3, a: 0.48 },
-        { y: 76, w: 5, a: 0.62 },
-        { y: 91, w: 3, a: 0.50 },
-        { y:103, w: 4, a: 0.58 },
-        { y:117, w: 3, a: 0.44 },
-        { y:128, w: 5, a: 0.60 },
-        { y:145, w: 3, a: 0.52 },
-        { y:155, w: 4, a: 0.48 },
-        { y:170, w: 3, a: 0.55 },
-        { y:186, w: 5, a: 0.62 },
-        { y:196, w: 3, a: 0.46 },
-        { y:210, w: 4, a: 0.58 },
-        { y:224, w: 3, a: 0.50 },
-        { y:234, w: 5, a: 0.60 },
-        { y:250, w: 3, a: 0.48 },
-        { y:263, w: 4, a: 0.55 },
-        { y:278, w: 3, a: 0.52 },
-        { y:290, w: 5, a: 0.62 },
-        { y:305, w: 3, a: 0.46 },
-        { y:314, w: 4, a: 0.58 },
-        { y:330, w: 3, a: 0.50 },
-        { y:345, w: 5, a: 0.60 },
-        { y:355, w: 3, a: 0.44 },
-        { y:370, w: 4, a: 0.55 },
-        { y:384, w: 3, a: 0.52 },
-        { y:393, w: 5, a: 0.62 },
-        { y:410, w: 3, a: 0.48 },
-        { y:423, w: 4, a: 0.56 },
-        { y:436, w: 3, a: 0.50 },
-        { y:450, w: 5, a: 0.60 },
-        { y:461, w: 3, a: 0.46 },
-        { y:475, w: 4, a: 0.55 },
-        { y:488, w: 3, a: 0.52 },
-        { y:501, w: 5, a: 0.58 },
-      ];
+
+      // Seeded pseudo-random for consistent look across reloads
+      let seed = 42;
+      const rand = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
+
+      const rings = [];
+      let y = 4 + rand() * 8;
+      while (y < 510) {
+        const w = 1.5 + rand() * 6;         // width: 1.5–7.5px
+        const a = 0.38 + rand() * 0.32;     // alpha: 0.38–0.70
+        rings.push({ y, w, a });
+        y += w + 5 + rand() * 22;           // gap: 5–27px between rings
+      }
+
       rings.forEach(({ y, w, a }) => {
         const grad = ctx.createLinearGradient(0, y - 1, 0, y + w + 1);
-        grad.addColorStop(0,   'rgba(110, 70, 20, 0)');
-        grad.addColorStop(0.3, 'rgba(110, 70, 20, ' + a + ')');
-        grad.addColorStop(0.7, 'rgba(110, 70, 20, ' + a + ')');
-        grad.addColorStop(1,   'rgba(110, 70, 20, 0)');
+        grad.addColorStop(0,   'rgba(100, 58, 14, 0)');
+        grad.addColorStop(0.3, 'rgba(100, 58, 14, ' + a + ')');
+        grad.addColorStop(0.7, 'rgba(100, 58, 14, ' + a + ')');
+        grad.addColorStop(1,   'rgba(100, 58, 14, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, y - 1, 4, w + 2);
       });
+
       const tex = new THREE.CanvasTexture(canvas);
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
