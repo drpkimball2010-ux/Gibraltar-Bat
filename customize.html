@@ -345,7 +345,7 @@
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
 
-    const keyLight = new THREE.DirectionalLight(0xfff8e8, 0.85);
+    const keyLight = new THREE.DirectionalLight(0xfff8e8, 0.55);
     keyLight.position.set(4, 6, 4);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
@@ -427,16 +427,16 @@
       natural: { label: 'Natural', hex: 0xC8A96E, roughness: 0.78, metalness: 0.04 },
       white:   { label: 'White',   hex: 0xEEEAE0, roughness: 0.25, metalness: 0.05 },
       walnut:  { label: 'Walnut',  hex: 0x4A2810, roughness: 0.72, metalness: 0.04 },
-      red:     { label: 'Red',     hex: 0xCC0000, roughness: 0.32, metalness: 0.04 },
-      maroon:  { label: 'Maroon',  hex: 0x7A0C20, roughness: 0.32, metalness: 0.04 },
-      orange:  { label: 'Orange',  hex: 0xD45000, roughness: 0.32, metalness: 0.04 },
+      red:     { label: 'Red',     hex: 0xCC0000, roughness: 0.62, metalness: 0.04 },
+      maroon:  { label: 'Maroon',  hex: 0x7A0C20, roughness: 0.62, metalness: 0.04 },
+      orange:  { label: 'Orange',  hex: 0xD45000, roughness: 0.62, metalness: 0.04 },
       black:   { label: 'Black',   hex: 0x111111, roughness: 0.28, metalness: 0.05 },
-      blue:    { label: 'Blue',    hex: 0x1040BB, roughness: 0.32, metalness: 0.04 },
-      lagoon:  { label: 'Lagoon',  hex: 0x007BA7, roughness: 0.32, metalness: 0.04 },
-      green:   { label: 'Green',   hex: 0x1A5C2E, roughness: 0.32, metalness: 0.04 },
-      purple:  { label: 'Purple',  hex: 0x5B1A8B, roughness: 0.32, metalness: 0.04 },
-      pink:    { label: 'Pink',    hex: 0xCC2266, roughness: 0.32, metalness: 0.04 },
-      yellow:  { label: 'Yellow',  hex: 0xD4A000, roughness: 0.32, metalness: 0.04 },
+      blue:    { label: 'Blue',    hex: 0x1040BB, roughness: 0.62, metalness: 0.04 },
+      lagoon:  { label: 'Lagoon',  hex: 0x007BA7, roughness: 0.62, metalness: 0.04 },
+      green:   { label: 'Green',   hex: 0x1A5C2E, roughness: 0.62, metalness: 0.04 },
+      purple:  { label: 'Purple',  hex: 0x5B1A8B, roughness: 0.62, metalness: 0.04 },
+      pink:    { label: 'Pink',    hex: 0xCC2266, roughness: 0.62, metalness: 0.04 },
+      yellow:  { label: 'Yellow',  hex: 0xD4A000, roughness: 0.62, metalness: 0.04 },
       striped: { label: 'Striped', texture: null,  roughness: 0.80, metalness: 0.03 },
     };
     COLORS.striped.texture = createStripedTexture();
