@@ -363,37 +363,38 @@
     function createStripedTexture() {
       const canvas = document.createElement('canvas');
       canvas.width  = 4;
-      canvas.height = 160;
+      canvas.height = 72;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#C8A96E';
-      ctx.fillRect(0, 0, 4, 160);
+      ctx.fillRect(0, 0, 4, 72);
 
       // Seeded pseudo-random for consistent look across reloads
       let seed = 42;
       const rand = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
 
       const rings = [];
-      let y = 4 + rand() * 8;
-      while (y < 158) {
-        const w = 1.5 + rand() * 6;         // width: 1.5–7.5px
-        const a = 0.38 + rand() * 0.32;     // alpha: 0.38–0.70
+      let y = 1 + rand() * 3;
+      while (y < 71) {
+        const w = 0.8 + rand() * 2.2;       // thin rings: 0.8–3px
+        const a = 0.30 + rand() * 0.40;     // alpha: 0.30–0.70
         rings.push({ y, w, a });
-        y += w + 2 + rand() * 10;           // gap: 2–12px between rings
+        y += w + 0.8 + rand() * 4.5;        // tight gap: 0.8–5.3px
       }
 
       rings.forEach(({ y, w, a }) => {
-        const grad = ctx.createLinearGradient(0, y - 1, 0, y + w + 1);
-        grad.addColorStop(0,   'rgba(100, 58, 14, 0)');
-        grad.addColorStop(0.3, 'rgba(100, 58, 14, ' + a + ')');
-        grad.addColorStop(0.7, 'rgba(100, 58, 14, ' + a + ')');
-        grad.addColorStop(1,   'rgba(100, 58, 14, 0)');
+        const grad = ctx.createLinearGradient(0, y - 0.5, 0, y + w + 0.5);
+        grad.addColorStop(0,   'rgba(95, 55, 12, 0)');
+        grad.addColorStop(0.35, 'rgba(95, 55, 12, ' + a + ')');
+        grad.addColorStop(0.65, 'rgba(95, 55, 12, ' + a + ')');
+        grad.addColorStop(1,   'rgba(95, 55, 12, 0)');
         ctx.fillStyle = grad;
-        ctx.fillRect(0, y - 1, 4, w + 2);
+        ctx.fillRect(0, y - 0.5, 4, w + 1);
       });
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 3);
       return tex;
     }
 
