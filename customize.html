@@ -363,10 +363,10 @@
     function createStripedTexture() {
       const canvas = document.createElement('canvas');
       canvas.width  = 4;
-      canvas.height = 96;
+      canvas.height = 160;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#C8A96E';
-      ctx.fillRect(0, 0, 4, 96);
+      ctx.fillRect(0, 0, 4, 160);
 
       // Seeded pseudo-random for consistent look across reloads
       let seed = 42;
@@ -374,7 +374,7 @@
 
       const rings = [];
       let y = 4 + rand() * 8;
-      while (y < 94) {
+      while (y < 158) {
         const w = 1.5 + rand() * 6;         // width: 1.5–7.5px
         const a = 0.38 + rand() * 0.32;     // alpha: 0.38–0.70
         rings.push({ y, w, a });
