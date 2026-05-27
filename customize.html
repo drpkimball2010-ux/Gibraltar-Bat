@@ -378,7 +378,7 @@
         const w = 1.5 + rand() * 6;         // width: 1.5–7.5px
         const a = 0.38 + rand() * 0.32;     // alpha: 0.38–0.70
         rings.push({ y, w, a });
-        y += w + 5 + rand() * 22;           // gap: 5–27px between rings
+        y += w + 2 + rand() * 10;           // gap: 2–12px between rings
       }
 
       rings.forEach(({ y, w, a }) => {
