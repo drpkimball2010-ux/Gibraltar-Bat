@@ -474,10 +474,9 @@
 
     // ─── Standard bat geometry ───────────────────────────────────────────────
     function rebuildStandard(length) {
-      const BR = 1.25;                       // 2.5" diameter barrel radius
-      const bl = 8;                          // barrel 8" long
-      const tl = 10 * (length / 33);        // taper 10" at 33", proportional
-      const hl = length - KNOB_H - tl - bl - BEVEL_H;
+      const hl = 12;
+      const bl = 6;
+      const tl = length - KNOB_H - hl - bl - BEVEL_H;
 
       const yKnobEnd   = KNOB_H;
       const yHandleEnd = yKnobEnd   + hl;
@@ -488,21 +487,8 @@
       const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
 
-      // Linear taper with smoothstep blend at each end to round the corners
-      const BLEND = 0.15;
-      const taperR = t => {
-        if (t < BLEND) {
-          const s = t / BLEND;
-          return HANDLE_R + s * s * (3 - 2 * s) * BLEND * (BR - HANDLE_R);
-        } else if (t > 1 - BLEND) {
-          const s = (t - (1 - BLEND)) / BLEND;
-          return HANDLE_R + ((1 - BLEND) + s * s * (3 - 2 * s) * BLEND) * (BR - HANDLE_R);
-        }
-        return HANDLE_R + t * (BR - HANDLE_R);
-      };
-
       const tPaint = (yPaint - yHandleEnd) / tl;
-      const rPaint = taperR(tPaint);
+      const rPaint = HANDLE_R + tPaint * (BARREL_R - HANDLE_R);
 
       const mid = yTopFace / 2;
       const S = SCALE;
@@ -520,7 +506,7 @@
 
       for (let i = 1; i <= 3; i++) {
         const t = (i / 4) * tPaint;
-        hPts.push(v(taperR(t), yHandleEnd + t * tl));
+        hPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
       }
       hPts.push(v(rPaint, yPaint));
 
@@ -528,20 +514,20 @@
 
       for (let i = 1; i <= 3; i++) {
         const t = tPaint + (i / 4) * (1 - tPaint);
-        bPts.push(v(taperR(t), yHandleEnd + t * tl));
+        bPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
       }
-      bPts.push(v(BR, yTaperEnd));
-      bPts.push(v(BR, yBarrelEnd));
+      bPts.push(v(BARREL_R, yTaperEnd));
+      bPts.push(v(BARREL_R, yBarrelEnd));
 
       for (let i = 1; i <= 6; i++) {
         const theta = (Math.PI / 2) * (i / 6);
         bPts.push(v(
-          (BR - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
+          (BARREL_R - BEVEL_IN) + BEVEL_IN * Math.cos(theta),
           yBarrelEnd + BEVEL_H * Math.sin(theta)
         ));
       }
 
-      const capR = (BR - BEVEL_IN) * S;
+      const capR = (BARREL_R - BEVEL_IN) * S;
       const capY = (yTopFace - mid) * S;
 
       handleMesh.geometry.dispose();
@@ -735,10 +721,10 @@
     }
 
     // ─── Sweet Spot bat geometry ─────────────────────────────────────────────
-    // Extra-long barrel (11"), slightly smaller diameter (2.375" = radius 1.1875)
+    // 8" barrel, 2.5" diameter, 10" proportional taper with rounded corners
     function rebuildSweetSpot(length) {
-      const BR = 1.1875;
-      const bl = 11;
+      const BR = 1.25;
+      const bl = 8;
       const tl = 10 * (length / 33);
       const hl = length - KNOB_H - tl - bl - BEVEL_H;
 
@@ -748,7 +734,7 @@
       const yBarrelEnd = yTaperEnd  + bl;
       const yTopFace   = yBarrelEnd + BEVEL_H;
 
-      const PAINT_DEPTH = 18 * (length / 33);
+      const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
 
       const BLEND = 0.15;
