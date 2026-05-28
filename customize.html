@@ -737,16 +737,9 @@
       const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
 
-      const BLEND = 0.15;
       const taperR = t => {
-        if (t < BLEND) {
-          const s = t / BLEND;
-          return HANDLE_R + s * s * (3 - 2 * s) * BLEND * (BR - HANDLE_R);
-        } else if (t > 1 - BLEND) {
-          const s = (t - (1 - BLEND)) / BLEND;
-          return HANDLE_R + ((1 - BLEND) + s * s * (3 - 2 * s) * BLEND) * (BR - HANDLE_R);
-        }
-        return HANDLE_R + t * (BR - HANDLE_R);
+        const s = t * t * (3 - 2 * t);
+        return HANDLE_R + s * (BR - HANDLE_R);
       };
 
       const tPaint = (yPaint - yHandleEnd) / tl;
