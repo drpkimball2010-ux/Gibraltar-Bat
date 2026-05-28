@@ -738,7 +738,7 @@
       const yPaint      = yTopFace - PAINT_DEPTH;
 
       const taperR = t => {
-        const s = t * t * (3 - 2 * t);
+        const s = t * t;
         return HANDLE_R + s * (BR - HANDLE_R);
       };
 
