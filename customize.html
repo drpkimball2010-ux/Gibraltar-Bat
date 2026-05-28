@@ -230,6 +230,7 @@
         <div class="len-options">
           <button class="len-btn active" data-type="standard">Standard</button>
           <button class="len-btn" data-type="torpedo">Torpedo</button>
+          <button class="len-btn" data-type="sweetspot">Sweet Spot</button>
           <button class="len-btn" data-type="fungo">Fungo</button>
         </div>
       </div>
@@ -444,9 +445,10 @@
     let fungoLength = 36;
 
     const PRICES = {
-      standard: { maple: 145, birch: 130, ash: 85 },
-      torpedo:  { maple: 145, birch: 130, ash: 85 },
-      fungo:    { maple: 100, birch: 100, ash: 100 },
+      standard:  { maple: 145, birch: 130, ash: 85 },
+      torpedo:   { maple: 145, birch: 130, ash: 85 },
+      sweetspot: { maple: 145, birch: 130, ash: 85 },
+      fungo:     { maple: 100, birch: 100, ash: 100 },
     };
 
     const PRO_PRICES = { maple: 205, birch: 190, ash: 150 };
@@ -457,10 +459,10 @@
     }
 
     function getCartName() {
-      const len    = batType === 'standard' ? stdLength : fungoLength;
+      const len    = batType === 'fungo' ? fungoLength : stdLength;
       const w      = batType === 'fungo' ? 'Maple' : wood.charAt(0).toUpperCase() + wood.slice(1);
       const g      = grade === 'proreserve' ? ' Pro Reserve' : '';
-      const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : 'Standard';
+      const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : batType === 'sweetspot' ? 'The Sweet Spot' : 'Standard';
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
       return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle;
@@ -732,10 +734,93 @@
       knobCapMesh.position.y = (0 - mid) * S;
     }
 
+    // ─── Sweet Spot bat geometry ─────────────────────────────────────────────
+    // Extra-long barrel (11"), slightly smaller diameter (2.375" = radius 1.1875)
+    function rebuildSweetSpot(length) {
+      const BR = 1.1875;
+      const bl = 11;
+      const tl = 10 * (length / 33);
+      const hl = length - KNOB_H - tl - bl - BEVEL_H;
+
+      const yKnobEnd   = KNOB_H;
+      const yHandleEnd = yKnobEnd   + hl;
+      const yTaperEnd  = yHandleEnd + tl;
+      const yBarrelEnd = yTaperEnd  + bl;
+      const yTopFace   = yBarrelEnd + BEVEL_H;
+
+      const PAINT_DEPTH = 18 * (length / 33);
+      const yPaint      = yTopFace - PAINT_DEPTH;
+
+      const BLEND = 0.15;
+      const taperR = t => {
+        if (t < BLEND) {
+          const s = t / BLEND;
+          return HANDLE_R + s * s * (3 - 2 * s) * BLEND * (BR - HANDLE_R);
+        } else if (t > 1 - BLEND) {
+          const s = (t - (1 - BLEND)) / BLEND;
+          return HANDLE_R + ((1 - BLEND) + s * s * (3 - 2 * s) * BLEND) * (BR - HANDLE_R);
+        }
+        return HANDLE_R + t * (BR - HANDLE_R);
+      };
+
+      const tPaint = (yPaint - yHandleEnd) / tl;
+      const rPaint = taperR(tPaint);
+
+      const mid = yTopFace / 2;
+      const S = SCALE;
+      const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
+
+      const hPts = [
+        v(0.85, 0), v(0.85, 0.333), v(0.80, 0.600),
+        v(0.72, 0.900), v(0.63, 1.200),
+        v(HANDLE_R, yKnobEnd), v(HANDLE_R, yHandleEnd),
+      ];
+      for (let i = 1; i <= 3; i++) {
+        const t = (i / 4) * tPaint;
+        hPts.push(v(taperR(t), yHandleEnd + t * tl));
+      }
+      hPts.push(v(rPaint, yPaint));
+
+      const bPts = [v(rPaint, yPaint)];
+      for (let i = 1; i <= 3; i++) {
+        const t = tPaint + (i / 4) * (1 - tPaint);
+        bPts.push(v(taperR(t), yHandleEnd + t * tl));
+      }
+      bPts.push(v(BR, yTaperEnd));
+      bPts.push(v(BR, yBarrelEnd));
+      for (let i = 1; i <= 6; i++) {
+        const theta = (Math.PI / 2) * (i / 6);
+        bPts.push(v((BR - BEVEL_IN) + BEVEL_IN * Math.cos(theta), yBarrelEnd + BEVEL_H * Math.sin(theta)));
+      }
+
+      const capR = (BR - BEVEL_IN) * S;
+      const capY = (yTopFace - mid) * S;
+
+      handleMesh.geometry.dispose();
+      barrelMesh.geometry.dispose();
+      capMesh.geometry.dispose();
+      knobCapMesh.geometry.dispose();
+
+      handleMesh.geometry = new THREE.LatheGeometry(hPts, SEG);
+      barrelMesh.geometry = new THREE.LatheGeometry(bPts, SEG);
+
+      const capGeo = new THREE.CircleGeometry(capR, SEG);
+      capGeo.rotateX(-Math.PI / 2);
+      capMesh.geometry = capGeo;
+      capMesh.position.y = capY;
+
+      const knobCapGeo = new THREE.CircleGeometry(0.85 * S, SEG);
+      knobCapGeo.rotateX(Math.PI / 2);
+      knobCapMesh.geometry = knobCapGeo;
+      knobCapMesh.position.y = (0 - mid) * S;
+    }
+
     // ─── Dispatcher ──────────────────────────────────────────────────────────
     function rebuildBat() {
       if (batType === 'torpedo') {
         rebuildTorpedo(stdLength);
+      } else if (batType === 'sweetspot') {
+        rebuildSweetSpot(stdLength);
       } else if (batType === 'fungo') {
         rebuildFungo(fungoLength);
       } else {
@@ -755,6 +840,7 @@
         document.getElementById('std-length-group').style.display   = batType !== 'fungo' ? '' : 'none';
         document.getElementById('fungo-length-group').style.display = batType === 'fungo' ? '' : 'none';
         document.getElementById('wood-group').style.display         = batType === 'fungo' ? 'none' : '';
+        document.getElementById('grade-group').style.display        = batType === 'fungo' ? 'none' : '';
         updatePrice();
         rebuildBat();
       });
