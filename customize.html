@@ -70,12 +70,12 @@
 
     .len-options {
       display: flex;
+      flex-wrap: wrap;
       gap: 0.4rem;
     }
 
     .len-btn {
-      flex: 1;
-      padding: 0.5rem 0.2rem;
+      padding: 0.5rem 0.6rem;
       border: 2px solid #ddd;
       border-radius: 5px;
       background: white;
@@ -83,6 +83,7 @@
       font-family: Arial, sans-serif;
       font-size: 0.78rem;
       font-weight: 700;
+      white-space: nowrap;
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
@@ -228,7 +229,7 @@
       <div class="config-group">
         <label>Bat Type</label>
         <div class="len-options">
-          <button class="len-btn active" data-type="sweetspot">Sweet Spot</button>
+          <button class="len-btn active" data-type="sweetspot">The Sweet Spot</button>
           <button class="len-btn" data-type="standard">Standard</button>
           <button class="len-btn" data-type="torpedo">Torpedo</button>
           <button class="len-btn" data-type="fungo">Fungo</button>
