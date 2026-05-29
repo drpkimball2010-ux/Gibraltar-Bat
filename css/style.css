@@ -55,6 +55,12 @@ img {
   align-items: center;
   gap: 0;
 }
+.nav-logo a {
+  display: contents;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
 .nav-logo-icon {
   height: 70px;
   width: auto;
