@@ -600,7 +600,7 @@
         bPts.push(v(HANDLE_R + t * (BARREL_R - HANDLE_R), yHandleEnd + t * tl));
       }
 
-      const yTorpedo   = yTopFace - 7;       // 7" from the top — taper starts here (fixed)
+      const yTorpedo   = Math.max(yTaperEnd, yTopFace - 7); // 7" from top, clamped to barrel start
       const torpedoEndR = BARREL_R - 0.25;  // 1.05" at the very end
 
       bPts.push(v(BARREL_R, yTaperEnd));  // barrel bottom — still full width
