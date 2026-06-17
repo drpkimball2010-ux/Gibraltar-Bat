@@ -86,20 +86,15 @@
         <div class="product-img"><span class="product-img-placeholder">Images Coming Soon</span></div>
         <div class="product-info">
           <h3>Maple — Standard</h3>
-          <p class="product-desc">Hard maple with dense grain and maximum pop. Stiff feel on contact, built for power hitters who turn on fastballs.</p>
-          <div class="wood-options">
-            <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
-            <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
-          </div>
-          <div class="size-options">
+          <p class="product-desc">Hard maple with dense grain and maximum pop. Stiff feel on contact, built for power hitters who turn on fastballs.</p>          <div class="size-options">
             <button class="size-btn" data-size="30">30"</button>
             <button class="size-btn" data-size="31">31"</button>
             <button class="size-btn" data-size="32">32"</button>
             <button class="size-btn active" data-size="33">33"</button>
           </div>
           <div class="product-footer">
-            <span class="price" data-base-price="130">$130</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Standard" data-price="130">Add to Cart</button>
+            <span class="price" data-base-price="120">$120</span>
+            <button class="btn-buy btn-buy-sized" data-name="Maple — Standard" data-price="120">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -108,20 +103,15 @@
         <div class="product-img"><span class="product-img-placeholder">Images Coming Soon</span></div>
         <div class="product-info">
           <h3>Maple — Torpedo</h3>
-          <p class="product-desc">Hard maple density meets the torpedo shape. Maximum mass at the sweet spot — built for hitters who want every edge at the plate.</p>
-          <div class="wood-options">
-            <button class="wood-btn active" data-wood="Standard" data-price="130">Standard</button>
-            <button class="wood-btn" data-wood="Pro Reserve" data-price="190">Pro Reserve</button>
-          </div>
-          <div class="size-options">
+          <p class="product-desc">Hard maple density meets the torpedo shape. Maximum mass at the sweet spot — built for hitters who want every edge at the plate.</p>          <div class="size-options">
             <button class="size-btn" data-size="30">30"</button>
             <button class="size-btn" data-size="31">31"</button>
             <button class="size-btn" data-size="32">32"</button>
             <button class="size-btn active" data-size="33">33"</button>
           </div>
           <div class="product-footer">
-            <span class="price" data-base-price="130">$130</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Torpedo" data-price="130">Add to Cart</button>
+            <span class="price" data-base-price="120">$120</span>
+            <button class="btn-buy btn-buy-sized" data-name="Maple — Torpedo" data-price="120">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -137,8 +127,8 @@
             <button class="size-btn active" data-size="36">36"</button>
           </div>
           <div class="product-footer">
-            <span class="price">$90</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Fungo" data-price="90">Add to Cart</button>
+            <span class="price">$80</span>
+            <button class="btn-buy btn-buy-sized" data-name="Maple — Fungo" data-price="80">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -182,13 +172,6 @@
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.product-card').forEach(function (card) {
         var sizeBtns = card.querySelectorAll('.size-btn');
-        var woodBtns = card.querySelectorAll('.wood-btn');
-        var buyBtn   = card.querySelector('.btn-buy-sized');
-        var priceEl  = card.querySelector('.price');
-
-        sizeBtns.forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            sizeBtns.forEach(function (b) { b.classList.remove('active'); });
             btn.classList.add('active');
           });
         });
