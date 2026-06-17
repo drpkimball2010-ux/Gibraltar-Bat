@@ -80,63 +80,8 @@
       <div class="underline"></div>
       <p>A few of our most popular models — see the full lineup in the shop.</p>
     </div>
-    <div class="product-grid">
-
-      <div class="product-card">
-        <div class="product-img"><span class="product-img-placeholder">Images Coming Soon</span></div>
-        <div class="product-info">
-          <h3>Maple — Standard</h3>
-          <p class="product-desc">Hard maple with dense grain and maximum pop. Stiff feel on contact, built for power hitters who turn on fastballs.</p>          <div class="size-options">
-            <button class="size-btn" data-size="30">30"</button>
-            <button class="size-btn" data-size="31">31"</button>
-            <button class="size-btn" data-size="32">32"</button>
-            <button class="size-btn active" data-size="33">33"</button>
-          </div>
-          <div class="product-footer">
-            <span class="price" data-base-price="190">$190</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Standard" data-price="190">Add to Cart</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img"><span class="product-img-placeholder">Images Coming Soon</span></div>
-        <div class="product-info">
-          <h3>Maple — Torpedo</h3>
-          <p class="product-desc">Hard maple density meets the torpedo shape. Maximum mass at the sweet spot — built for hitters who want every edge at the plate.</p>          <div class="size-options">
-            <button class="size-btn" data-size="30">30"</button>
-            <button class="size-btn" data-size="31">31"</button>
-            <button class="size-btn" data-size="32">32"</button>
-            <button class="size-btn active" data-size="33">33"</button>
-          </div>
-          <div class="product-footer">
-            <span class="price" data-base-price="190">$190</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Torpedo" data-price="190">Add to Cart</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img"><span class="product-img-placeholder">Images Coming Soon</span></div>
-        <div class="product-info">
-          <h3>Maple — Fungo</h3>
-          <p class="product-desc">Maple fungo for coaches who prefer a stiffer feel and precise control when directing the ball around the field.</p>
-          <div class="size-options">
-            <button class="size-btn" data-size="34">34"</button>
-            <button class="size-btn" data-size="35">35"</button>
-            <button class="size-btn active" data-size="36">36"</button>
-          </div>
-          <div class="product-footer">
-            <span class="price">$90</span>
-            <button class="btn-buy btn-buy-sized" data-name="Maple — Fungo" data-price="90">Add to Cart</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
     <div style="text-align:center; margin-top: 2.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <a href="shop.html" class="btn btn-primary">View All Bats</a>
-      <a href="customize.html" class="btn" style="background: transparent; color: var(--navy); border-color: var(--navy);">Design a Custom Bat</a>
+      <a href="customize.html" class="btn btn-primary">Design Your Bat</a>
     </div>
   </section>
 
@@ -168,38 +113,6 @@
       <a href="checkout.html" class="btn-checkout">Check Out</a>
     </div>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      document.querySelectorAll('.product-card').forEach(function (card) {
-        var sizeBtns = card.querySelectorAll('.size-btn');
-            btn.classList.add('active');
-          });
-        });
-
-        woodBtns.forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            woodBtns.forEach(function (b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            var price = btn.dataset.price;
-            if (buyBtn) buyBtn.dataset.price = price;
-            if (priceEl) priceEl.textContent = '$' + price;
-          });
-        });
-
-        if (!buyBtn) return;
-        buyBtn.addEventListener('click', function () {
-          var activeSize = card.querySelector('.size-btn.active');
-          var activeWood = card.querySelector('.wood-btn.active');
-          var size = activeSize ? activeSize.dataset.size : '33';
-          var wood = activeWood ? activeWood.dataset.wood : 'Standard';
-          var name = buyBtn.dataset.name + (wood === 'Pro Reserve' ? ' (Pro Reserve)' : '') + ' ' + size + '"';
-          if (window.GibraltarCart) {
-            window.GibraltarCart.add(name, Number(buyBtn.dataset.price));
-          }
-        });
-      });
-    });
-  </script>
   <script src="js/cart.js"></script>
 </body>
 </html>

@@ -246,6 +246,16 @@
         </div>
       </div>
 
+      <!-- Grade -->
+      <div class="config-group" id="grade-group">
+        <label>Grade</label>
+        <div class="len-options">
+          <button class="len-btn active" data-grade="standard">Standard</button>
+          <button class="len-btn" data-grade="proreserve">Pro Reserve</button>
+        </div>
+        <p id="standard-note" style="display:block; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Custom bats ship within 2–3 weeks.</p>
+        <p id="pro-reserve-note" style="display:none; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Made to order — allow 4–5 weeks for delivery.</p>
+      </div>
 
       <!-- Standard Length -->
       <div class="config-group" id="std-length-group">
@@ -434,25 +444,30 @@
     let stdLength   = 33;
     let fungoLength = 36;
 
+    let grade       = 'standard';
+
     const PRICES = {
-      standard:  { maple: 205, birch: 190, ash: 150 },
-      torpedo:   { maple: 205, birch: 190, ash: 150 },
-      sweetspot: { maple: 205, birch: 190, ash: 150 },
+      standard:  { maple: 145, birch: 130, ash: 85 },
+      torpedo:   { maple: 145, birch: 130, ash: 85 },
+      sweetspot: { maple: 145, birch: 130, ash: 85 },
       fungo:     { maple: 100, birch: 100, ash: 100 },
     };
 
+    const PRO_PRICES = { maple: 205, birch: 190, ash: 150 };
+
     function getPrice() {
       if (batType === 'fungo') return PRICES.fungo.maple;
-      return PRICES[batType][wood];
+      return grade === 'proreserve' ? PRO_PRICES[wood] : PRICES[batType][wood];
     }
 
     function getCartName() {
       const len    = batType === 'fungo' ? fungoLength : stdLength;
       const w      = batType === 'fungo' ? 'Maple' : wood.charAt(0).toUpperCase() + wood.slice(1);
+      const g      = grade === 'proreserve' ? ' Pro Reserve' : '';
       const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : batType === 'sweetspot' ? 'The Sweet Spot' : 'Standard';
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
-      return 'Custom ' + w + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle;
+      return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle;
     }
 
     function updatePrice() {
@@ -806,8 +821,20 @@
         document.getElementById('std-length-group').style.display   = batType !== 'fungo' ? '' : 'none';
         document.getElementById('fungo-length-group').style.display = batType === 'fungo' ? '' : 'none';
         document.getElementById('wood-group').style.display         = batType === 'fungo' ? 'none' : '';
+        document.getElementById('grade-group').style.display        = batType === 'fungo' ? 'none' : '';
         updatePrice();
         rebuildBat();
+      });
+    });
+
+    document.querySelectorAll('[data-grade]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-grade]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        grade = btn.dataset.grade;
+        updatePrice();
+        document.getElementById('standard-note').style.display = grade === 'proreserve' ? 'none' : 'block';
+        document.getElementById('pro-reserve-note').style.display = grade === 'proreserve' ? 'block' : 'none';
       });
     });
 
