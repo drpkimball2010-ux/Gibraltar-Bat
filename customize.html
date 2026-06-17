@@ -812,15 +812,6 @@
 
     rebuildBat();
 
-    // ─── Pre-select bat type from URL param (?type=torpedo etc.) ─────────────
-    (function () {
-      const param = new URLSearchParams(window.location.search).get('type');
-      if (param && ['standard', 'torpedo', 'sweetspot', 'fungo'].includes(param)) {
-        const btn = document.querySelector('[data-type="' + param + '"]');
-        if (btn) btn.click();
-      }
-    })();
-
     // ─── UI event handlers ───────────────────────────────────────────────────
 
     document.querySelectorAll('[data-type]').forEach(btn => {
@@ -881,6 +872,15 @@
         window.GibraltarCart.add(getCartName(), getPrice());
       }
     });
+
+    // ─── Pre-select bat type from URL param (?type=torpedo etc.) ─────────────
+    (function () {
+      const param = new URLSearchParams(window.location.search).get('type');
+      if (param && ['standard', 'torpedo', 'sweetspot', 'fungo'].includes(param)) {
+        const btn = document.querySelector('[data-type="' + param + '"]');
+        if (btn) btn.click();
+      }
+    })();
 
     // ─── Resize ──────────────────────────────────────────────────────────────
     function onResize() {
