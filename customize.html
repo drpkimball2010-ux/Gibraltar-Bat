@@ -404,15 +404,32 @@
     // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
     const ORBIT_SPEED_THETA = Math.PI * 0.85; // radians/sec while held (~153°/s)
     const ORBIT_SPEED_PHI   = Math.PI * 0.65; // radians/sec while held (~117°/s)
-    const ORBIT_PHI_MIN     = 0.15;
-    const ORBIT_PHI_MAX     = Math.PI - 0.15;
 
-    function nudgeOrbit(deltaTheta, deltaPhi) {
+    // THREE.Spherical always reports phi canonicalized to [0, π] (it comes
+    // from acos), so re-deriving it from the camera position every frame and
+    // accumulating past 0 or π just reflects to the opposite azimuth instead
+    // of truly continuing — it oscillates in place at the pole rather than
+    // spinning through. Instead we keep our own persistent, unbounded theta/
+    // phi that we only resync from the actual camera position once at the
+    // start of a gesture (so it stays correct after a mouse drag), and drive
+    // the position forward every frame via raw setFromSphericalCoords, which
+    // has no range restriction and composes correctly through the poles.
+    let orbitRadius = 6.0;
+    let orbitTheta  = 0;
+    let orbitPhi    = Math.PI / 2;
+
+    function syncOrbitFromCamera() {
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
       const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.theta += deltaTheta;
-      spherical.phi = Math.min(Math.max(spherical.phi + deltaPhi, ORBIT_PHI_MIN), ORBIT_PHI_MAX);
-      offset.setFromSpherical(spherical);
+      orbitRadius = spherical.radius;
+      orbitTheta  = spherical.theta;
+      orbitPhi    = spherical.phi;
+    }
+
+    function nudgeOrbit(deltaTheta, deltaPhi) {
+      orbitTheta += deltaTheta;
+      orbitPhi   += deltaPhi;
+      const offset = new THREE.Vector3().setFromSphericalCoords(orbitRadius, orbitPhi, orbitTheta);
       camera.position.copy(controls.target).add(offset);
       controls.update();
     }
@@ -438,6 +455,7 @@
         e.preventDefault();
         if (holding) return;
         holding = true;
+        syncOrbitFromCamera();
         lastTime = performance.now();
         requestAnimationFrame(frame);
       }
