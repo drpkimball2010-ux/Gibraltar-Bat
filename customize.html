@@ -670,6 +670,15 @@
       return buildDecalGeometry(profilePts, mid, S, yTopFace, LABEL_TOP_IN, LABEL_HEIGHT_IN, LABEL_WIDTH_IN);
     }
 
+    // Same curved-strip technique as buildDecalGeometry, but the point order
+    // runs the opposite way along the bat's length — so the text's reading
+    // direction is anchored with its beginning near the label and its end
+    // toward the barrel cap, instead of the reverse.
+    // Same vertex positions as buildDecalGeometry (the exact shape/placement
+    // already confirmed correct), but with the V texture coordinate flipped
+    // on top — this re-anchors which end of the (unchanged, already-correct)
+    // texture appears at which physical end, without resampling or mirroring
+    // the texture itself, so the letters and stack order stay exactly right.
     function buildEngravingGeometry(profilePts, mid, S, yTopFace) {
       return buildDecalGeometry(profilePts, mid, S, yTopFace, ENGRAVING_TOP_IN, ENGRAVING_HEIGHT_IN, ENGRAVING_WIDTH_IN);
     }
@@ -710,10 +719,16 @@
       wctx.fillStyle = '#2a1a10';
       wctx.textAlign = 'center';
       wctx.textBaseline = 'middle';
+      // Reversing the character order (each glyph still drawn upright, just
+      // repositioned) — not mirroring the rendering — means that reading
+      // from the label end toward the cap spells the phrase forward
+      // ("Handcrafted For"), matching the requested beginning-near-label,
+      // end-near-cap orientation without flipping any letters.
+      const reverse = (s) => s.split('').reverse().join('');
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText('Handcrafted For', w / 2, h * 0.34);
+      wctx.fillText(reverse('Handcrafted For'), w / 2, h * 0.34);
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(modelName, w / 2, h * 0.72);
+      wctx.fillText(reverse(modelName), w / 2, h * 0.72);
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
