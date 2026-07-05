@@ -116,6 +116,11 @@
       box-shadow: 0 0 0 2px var(--navy);
       transform: scale(1.13);
     }
+    .swatch:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+    .swatch:disabled:hover { transform: none; }
     .swatch[data-color="natural"] { background: #C8A96E; }
     .swatch[data-color="white"]   { background: #EEEAE0; border: 1.5px solid #ccc; }
     .swatch[data-color="walnut"]  { background: #4A2810; }
@@ -291,6 +296,13 @@
         <div class="color-name" id="handle-name">Natural</div>
       </div>
 
+      <div class="config-group">
+        <label>Label Color</label>
+        <div class="swatches" id="label-swatches"></div>
+        <div class="color-name" id="label-name">Black</div>
+        <p style="font-family:Arial,sans-serif; font-size:0.75rem; color:#999; margin-top:0.3rem;">Can't match the barrel color.</p>
+      </div>
+
       <hr class="config-divider" />
 
       <div class="price-row">
@@ -425,6 +437,15 @@
     const barrelMat = new THREE.MeshStandardMaterial({
       color: COLORS.natural.hex, roughness: COLORS.natural.roughness, metalness: COLORS.natural.metalness,
     });
+    const labelMat = new THREE.MeshStandardMaterial({
+      transparent: true,
+      roughness: 0.55,
+      metalness: 0.03,
+      alphaTest: 0.05,
+      polygonOffset: true,
+      polygonOffsetFactor: -4,
+      polygonOffsetUnits: -4,
+    });
 
     // ─── Bat group ───────────────────────────────────────────────────────────
     const bat = new THREE.Group();
@@ -435,9 +456,11 @@
     const barrelMesh  = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
     const capMesh     = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
     const knobCapMesh = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
+    const labelMesh    = new THREE.Mesh(new THREE.BufferGeometry(), labelMat);
     handleMesh.castShadow = true;
     barrelMesh.castShadow = true;
-    bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh);
+    labelMesh.visible = false;
+    bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh, labelMesh);
 
     // ─── State ───────────────────────────────────────────────────────────────
     let batType     = 'sweetspot';
@@ -446,6 +469,113 @@
     let fungoLength = 36;
 
     let grade       = 'standard';
+
+    let barrelColorKey = 'natural';
+    let labelColorKey  = 'black';
+
+    // ─── Label decal ─────────────────────────────────────────────────────────
+    // Runs 6"–12" from the tip of the bat, sized from the source art's aspect
+    // ratio once rotated 90° so it reads level when the bat is held sideways.
+    const LABEL_COLOR_KEYS = Object.keys(COLORS).filter(k => k !== 'striped');
+    const LABEL_TOP_IN    = 6;   // distance from tip to the label's top edge
+    const LABEL_HEIGHT_IN = 6;   // label span, top edge to bottom edge
+    let LABEL_WIDTH_IN    = 6 * (312 / 544); // refined once the source image loads
+
+    function hexToCss(hex) {
+      return '#' + hex.toString(16).padStart(6, '0');
+    }
+
+    const labelImg = new Image();
+    let labelSourceCanvas = null;
+
+    function buildLabelSourceCanvas() {
+      const iw = labelImg.naturalWidth, ih = labelImg.naturalHeight;
+      const c = document.createElement('canvas');
+      c.width = ih;
+      c.height = iw;
+      const ctx = c.getContext('2d');
+      ctx.translate(c.width / 2, c.height / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(labelImg, -iw / 2, -ih / 2);
+      labelSourceCanvas = c;
+    }
+
+    const labelTexture = new THREE.CanvasTexture(document.createElement('canvas'));
+
+    function applyLabelColor(key) {
+      labelColorKey = key;
+      document.getElementById('label-name').textContent = COLORS[key].label;
+      document.querySelectorAll('#label-swatches .swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.color === key);
+      });
+      if (!labelSourceCanvas) return;
+      const w = labelSourceCanvas.width, h = labelSourceCanvas.height;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(labelSourceCanvas, 0, 0);
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = hexToCss(COLORS[key].hex);
+      ctx.fillRect(0, 0, w, h);
+      labelTexture.image = canvas;
+      labelTexture.needsUpdate = true;
+      labelMat.map = labelTexture;
+      labelMat.color.setHex(0xffffff);
+      labelMat.needsUpdate = true;
+    }
+
+    function pickFallbackLabelColor(avoidKey) {
+      return LABEL_COLOR_KEYS.find(k => k !== avoidKey) || LABEL_COLOR_KEYS[0];
+    }
+
+    function updateLabelSwatchAvailability() {
+      document.querySelectorAll('#label-swatches .swatch').forEach(btn => {
+        const conflict = btn.dataset.color === barrelColorKey;
+        btn.disabled = conflict;
+        btn.classList.toggle('disabled', conflict);
+      });
+    }
+
+    // Reads the scaled (r, y) profile built by a rebuild*() call and linearly
+    // interpolates the barrel/handle radius at an arbitrary world-space y, so
+    // the label always hugs the true surface (taper included) at any length.
+    function interpRadius(profilePts, yWorld, mid, S) {
+      const yScaled = (yWorld - mid) * S;
+      for (let i = 0; i < profilePts.length - 1; i++) {
+        const a = profilePts[i], b = profilePts[i + 1];
+        if (yScaled >= a.y && yScaled <= b.y) {
+          const t = (yScaled - a.y) / ((b.y - a.y) || 1e-9);
+          return a.x + t * (b.x - a.x);
+        }
+      }
+      return yScaled < profilePts[0].y ? profilePts[0].x : profilePts[profilePts.length - 1].x;
+    }
+
+    function buildLabelGeometry(profilePts, mid, S, yTopFace) {
+      const yTop = yTopFace - LABEL_TOP_IN;
+      const yBot = yTop - LABEL_HEIGHT_IN;
+      const N = 24;
+      const pts = [];
+      for (let i = 0; i <= N; i++) {
+        const yWorld  = yBot + (yTop - yBot) * (i / N);
+        const rScaled = interpRadius(profilePts, yWorld, mid, S);
+        pts.push(new THREE.Vector2(rScaled + 0.006, (yWorld - mid) * S));
+      }
+      const rMidScaled = interpRadius(profilePts, (yTop + yBot) / 2, mid, S);
+      const rMidInches  = rMidScaled / S;
+      const phiLength    = LABEL_WIDTH_IN / rMidInches;
+      return new THREE.LatheGeometry(pts, 24, -phiLength / 2, phiLength);
+    }
+
+    labelImg.onload = () => {
+      LABEL_WIDTH_IN = LABEL_HEIGHT_IN * (labelImg.naturalHeight / labelImg.naturalWidth);
+      buildLabelSourceCanvas();
+      applyLabelColor(labelColorKey);
+      labelMesh.visible = true;
+      rebuildBat();
+    };
+    labelImg.src = 'images/label-logo.png';
 
     const PRICES = {
       standard:  { maple: 145, birch: 130, ash: 85 },
@@ -468,7 +598,8 @@
       const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : batType === 'sweetspot' ? 'The Sweet Spot' : 'Standard';
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
-      return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle;
+      const label  = document.getElementById('label-name').textContent;
+      return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle + ', Label: ' + label;
     }
 
     function updatePrice() {
@@ -549,6 +680,9 @@
       knobCapGeo.rotateX(Math.PI / 2);
       knobCapMesh.geometry = knobCapGeo;
       knobCapMesh.position.y = (0 - mid) * S;
+
+      labelMesh.geometry.dispose();
+      labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Torpedo bat geometry ────────────────────────────────────────────────
@@ -636,6 +770,9 @@
       knobCapGeo.rotateX(Math.PI / 2);
       knobCapMesh.geometry = knobCapGeo;
       knobCapMesh.position.y = (0 - mid) * S;
+
+      labelMesh.geometry.dispose();
+      labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Fungo bat geometry ──────────────────────────────────────────────────
@@ -721,6 +858,9 @@
       knobCapGeo.rotateX(Math.PI / 2);
       knobCapMesh.geometry = knobCapGeo;
       knobCapMesh.position.y = (0 - mid) * S;
+
+      labelMesh.geometry.dispose();
+      labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Sweet Spot bat geometry ─────────────────────────────────────────────
@@ -795,6 +935,9 @@
       knobCapGeo.rotateX(Math.PI / 2);
       knobCapMesh.geometry = knobCapGeo;
       knobCapMesh.position.y = (0 - mid) * S;
+
+      labelMesh.geometry.dispose();
+      labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Dispatcher ──────────────────────────────────────────────────────────
@@ -924,7 +1067,7 @@
       mat.needsUpdate = true;
     }
 
-    function buildSwatches(containerId, nameId, mat, initial) {
+    function buildSwatches(containerId, nameId, mat, initial, onChange) {
       const wrap = document.getElementById(containerId);
       const lbl  = document.getElementById(nameId);
       Object.entries(COLORS).forEach(([key, { label }]) => {
@@ -937,13 +1080,38 @@
           btn.classList.add('active');
           lbl.textContent = label;
           applyColor(mat, key);
+          if (onChange) onChange(key);
         });
         wrap.appendChild(btn);
       });
     }
 
-    buildSwatches('barrel-swatches', 'barrel-name', barrelMat, 'natural');
+    function buildLabelSwatches() {
+      const wrap = document.getElementById('label-swatches');
+      LABEL_COLOR_KEYS.forEach(key => {
+        const { label } = COLORS[key];
+        const btn = document.createElement('button');
+        btn.className     = 'swatch' + (key === labelColorKey ? ' active' : '');
+        btn.dataset.color = key;
+        btn.title         = label;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          applyLabelColor(key);
+        });
+        wrap.appendChild(btn);
+      });
+      updateLabelSwatchAvailability();
+    }
+
+    buildSwatches('barrel-swatches', 'barrel-name', barrelMat, 'natural', (key) => {
+      barrelColorKey = key;
+      updateLabelSwatchAvailability();
+      if (labelColorKey === key) {
+        applyLabelColor(pickFallbackLabelColor(key));
+      }
+    });
     buildSwatches('handle-swatches', 'handle-name', handleMat, 'natural');
+    buildLabelSwatches();
   </script>
 
   <div class="cart-panel" id="cart-panel">
