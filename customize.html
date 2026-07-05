@@ -494,6 +494,19 @@
     controls.maxDistance   = 12.0;
     controls.target.set(0, 0, 0);
 
+    // The bat's actual current "length" axis in world space — (0,1,0) when
+    // standing vertical, rotates to (-1,0,0) once the recenter button spins
+    // it to lie horizontal (bat.rotation.z applied around world Z). Orbiting
+    // left/right always needs to spin around THIS axis, not a fixed world
+    // axis — otherwise, once horizontal, left/right would spin the camera
+    // around the vertical world axis instead of the bat's own length axis,
+    // which looks like the bat tumbling/spinning rather than rotating in
+    // place around itself.
+    const Z_AXIS = new THREE.Vector3(0, 0, 1);
+    function getBatAxis() {
+      return new THREE.Vector3(0, 1, 0).applyAxisAngle(Z_AXIS, bat.rotation.z);
+    }
+
     // Trackpad two-finger swipes fire as 'wheel' events with both deltaX and
     // deltaY, not as a mouse drag. OrbitControls' own wheel handler only ever
     // reads deltaY (to zoom) and silently ignores deltaX entirely — so a
@@ -504,17 +517,15 @@
     canvas.addEventListener('wheel', (event) => {
       if (Math.abs(event.deltaX) < 1e-3) return;
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.theta -= event.deltaX * WHEEL_ROTATE_SPEED;
-      offset.setFromSpherical(spherical);
+      offset.applyAxisAngle(getBatAxis(), -event.deltaX * WHEEL_ROTATE_SPEED);
       camera.position.copy(controls.target).add(offset);
     }, { passive: true });
 
     // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
     const ORBIT_SPEED_THETA = Math.PI * 0.85; // radians/sec while held (~153°/s)
     const ORBIT_SPEED_PHI   = Math.PI * 0.65; // radians/sec while held (~117°/s)
-    const ORBIT_PHI_MIN     = 0.15;
-    const ORBIT_PHI_MAX     = Math.PI - 0.15;
+    const ORBIT_ANGLE_MIN   = 0.15;
+    const ORBIT_ANGLE_MAX   = Math.PI - 0.15;
 
     // Neither nudge function calls controls.update() — the main render loop
     // already calls it once per frame. Calling it again here made it run
@@ -525,19 +536,53 @@
     // to whatever a drag or scroll-zoom did in between button presses.
     function nudgeTheta(deltaTheta) {
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.theta += deltaTheta;
-      offset.setFromSpherical(spherical);
+      offset.applyAxisAngle(getBatAxis(), deltaTheta);
       camera.position.copy(controls.target).add(offset);
     }
 
     function nudgePhi(deltaPhi) {
+      const batAxis = getBatAxis();
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.phi = Math.min(Math.max(spherical.phi + deltaPhi, ORBIT_PHI_MIN), ORBIT_PHI_MAX);
-      offset.setFromSpherical(spherical);
+      const currentAngle = offset.angleTo(batAxis);
+      const clampedDelta = Math.min(Math.max(currentAngle + deltaPhi, ORBIT_ANGLE_MIN), ORBIT_ANGLE_MAX) - currentAngle;
+      const pitchAxis = new THREE.Vector3().crossVectors(offset, batAxis);
+      if (pitchAxis.lengthSq() < 1e-8) return; // degenerate right at the pole; skip this frame
+      pitchAxis.normalize();
+      offset.applyAxisAngle(pitchAxis, -clampedDelta);
       camera.position.copy(controls.target).add(offset);
     }
+
+    // OrbitControls' own click-drag rotate always orbits around world Y
+    // (via its internal quaternion alignment to camera.up) — redirecting
+    // that to the dynamic bat axis would require changing camera.up, which
+    // also cancels out the bat's visual vertical/horizontal rotation (they
+    // share the same lookAt-driven roll). So drag-to-rotate is handled here
+    // instead, reusing the same nudgeTheta/nudgePhi used by the arrow pad,
+    // to stay consistent (rolling around the bat's real axis) in both
+    // orientations. Only zoom is left to OrbitControls.
+    controls.enableRotate = false;
+    const DRAG_ROTATE_SPEED = 0.005; // radians per pixel of pointer movement
+    let dragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastPointerX;
+      const dy = e.clientY - lastPointerY;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      nudgeTheta(-dx * DRAG_ROTATE_SPEED);
+      nudgePhi(-dy * DRAG_ROTATE_SPEED);
+    });
+    ['pointerup', 'pointercancel'].forEach(evt => canvas.addEventListener(evt, () => { dragging = false; }));
 
     // Drives rotation from a requestAnimationFrame loop scaled by real elapsed
     // time, so held movement rides the render framerate instead of jumping in
