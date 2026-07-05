@@ -562,6 +562,14 @@
 
     let grade       = 'standard';
 
+    // Set by each rebuild*() to the bat's current total height (world units),
+    // so rebuildBat() can tell how much a length change actually altered the
+    // overall size and compensate the camera distance to match — otherwise,
+    // at a fixed camera distance, even a 1" length change renders as a
+    // jarring proportional jump in on-screen size instead of the subtle
+    // change it would be in real life.
+    let currentYTopFace = null;
+
     let barrelColorKey = 'natural';
     let labelColorKey  = 'black';
 
@@ -709,6 +717,7 @@
       const yTaperEnd  = yHandleEnd + tl;
       const yBarrelEnd = yTaperEnd  + bl;
       const yTopFace   = yBarrelEnd + BEVEL_H;
+      currentYTopFace = yTopFace;
 
       const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
@@ -792,6 +801,7 @@
       const yTaperEnd  = yHandleEnd + tl;
       const yBarrelEnd = yTaperEnd  + bl;
       const yTopFace   = yBarrelEnd + BEVEL_H;
+      currentYTopFace = yTopFace;
 
       // Paint boundary: same as standard
       const PAINT_DEPTH = 15 * (length / 33);
@@ -884,6 +894,7 @@
       const yTaperEnd  = yHandleEnd + ftl;
       const yBarrelEnd = yTaperEnd  + fbl;
       const yTopFace   = yBarrelEnd + BEVEL_H;
+      currentYTopFace = yTopFace;
 
       const PAINT_DEPTH = 17 * (length / 36);
       const yPaint      = yTopFace - PAINT_DEPTH;
@@ -968,6 +979,7 @@
       const yTaperEnd  = yHandleEnd + tl;
       const yBarrelEnd = yTaperEnd  + bl;
       const yTopFace   = yBarrelEnd + BEVEL_H;
+      currentYTopFace = yTopFace;
 
       const PAINT_DEPTH = 15 * (length / 33);
       const yPaint      = yTopFace - PAINT_DEPTH;
@@ -1034,6 +1046,8 @@
 
     // ─── Dispatcher ──────────────────────────────────────────────────────────
     function rebuildBat() {
+      const prevYTopFace = currentYTopFace;
+
       if (batType === 'torpedo') {
         rebuildTorpedo(stdLength);
       } else if (batType === 'sweetspot') {
@@ -1042,6 +1056,17 @@
         rebuildFungo(fungoLength);
       } else {
         rebuildStandard(stdLength);
+      }
+
+      // Compensate the camera distance so a length (or type) change alone
+      // doesn't make the bat's on-screen size jump proportionally to the
+      // fixed camera distance — only the actual shape difference should be
+      // visible, the way swapping to a 1" shorter bat barely reads at all.
+      if (prevYTopFace !== null && prevYTopFace !== currentYTopFace) {
+        const ratio = currentYTopFace / prevYTopFace;
+        const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+        offset.multiplyScalar(ratio);
+        camera.position.copy(controls.target).add(offset);
       }
     }
 
