@@ -719,10 +719,16 @@
       wctx.fillStyle = '#2a1a10';
       wctx.textAlign = 'center';
       wctx.textBaseline = 'middle';
+      // Reversing character order (each glyph still drawn upright, just
+      // repositioned) anchors "H" near the label and the end of each line
+      // toward the barrel cap, per the user's explicit choice after seeing
+      // the trade-off (it reads back-to-front scanning top-to-bottom, but
+      // the requested end is anchored correctly).
+      const reverse = (s) => s.split('').reverse().join('');
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText('Handcrafted For', w / 2, h * 0.34);
+      wctx.fillText(reverse('Handcrafted For'), w / 2, h * 0.34);
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(modelName, w / 2, h * 0.72);
+      wctx.fillText(reverse(modelName), w / 2, h * 0.72);
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
