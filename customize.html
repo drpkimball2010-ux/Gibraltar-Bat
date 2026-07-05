@@ -12,12 +12,18 @@
     .config-wrap {
       display: flex;
       height: calc(100vh - 70px);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     #bat-canvas {
       flex: 1;
       display: block;
       cursor: grab;
+      touch-action: none;
+      -webkit-user-drag: none;
     }
     #bat-canvas:active { cursor: grabbing; }
 
