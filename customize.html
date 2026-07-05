@@ -10,6 +10,7 @@
     body { overflow: hidden; }
 
     .config-wrap {
+      position: relative;
       display: flex;
       height: calc(100vh - 70px);
     }
@@ -20,6 +21,37 @@
       cursor: grab;
     }
     #bat-canvas:active { cursor: grabbing; }
+
+    .orbit-pad {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 36px);
+      grid-template-rows: repeat(3, 36px);
+      gap: 4px;
+      z-index: 5;
+    }
+    .orbit-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(11, 26, 46, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.95rem;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .orbit-btn:hover  { background: rgba(212, 164, 0, 0.55); border-color: var(--gold); }
+    .orbit-btn:active { background: rgba(212, 164, 0, 0.85); }
+    .orbit-up    { grid-column: 2; grid-row: 1; }
+    .orbit-left  { grid-column: 1; grid-row: 2; }
+    .orbit-right { grid-column: 3; grid-row: 2; }
+    .orbit-down  { grid-column: 2; grid-row: 3; }
 
     .config-panel {
       width: 280px;
@@ -193,6 +225,11 @@
       body { overflow: auto; }
       .config-wrap { flex-direction: column; height: auto; }
       #bat-canvas { width: 100%; height: 65vw; min-height: 320px; }
+      .orbit-pad {
+        left: 12px;
+        bottom: auto;
+        top: calc(max(65vw, 320px) - 128px);
+      }
       .config-panel {
         width: 100%;
         border-left: none;
@@ -223,6 +260,13 @@
 
   <div class="config-wrap">
     <canvas id="bat-canvas"></canvas>
+
+    <div class="orbit-pad" aria-label="Rotate bat view">
+      <button type="button" class="orbit-btn orbit-up" data-orbit="up" aria-label="Tilt up">▲</button>
+      <button type="button" class="orbit-btn orbit-left" data-orbit="left" aria-label="Rotate left">◀</button>
+      <button type="button" class="orbit-btn orbit-right" data-orbit="right" aria-label="Rotate right">▶</button>
+      <button type="button" class="orbit-btn orbit-down" data-orbit="down" aria-label="Tilt down">▼</button>
+    </div>
 
     <aside class="config-panel">
       <h2>Design Your Bat</h2>
@@ -356,6 +400,27 @@
     controls.minDistance   = 3.0;
     controls.maxDistance   = 12.0;
     controls.target.set(0, 0, 0);
+
+    // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
+    const ORBIT_STEP_THETA = Math.PI / 18; // 10° per click
+    const ORBIT_STEP_PHI   = Math.PI / 24; // 7.5° per click
+    const ORBIT_PHI_MIN    = 0.15;
+    const ORBIT_PHI_MAX    = Math.PI - 0.15;
+
+    function nudgeOrbit(deltaTheta, deltaPhi) {
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      const spherical = new THREE.Spherical().setFromVector3(offset);
+      spherical.theta += deltaTheta;
+      spherical.phi = Math.min(Math.max(spherical.phi + deltaPhi, ORBIT_PHI_MIN), ORBIT_PHI_MAX);
+      offset.setFromSpherical(spherical);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    }
+
+    document.querySelector('[data-orbit="left"]').addEventListener('click', () => nudgeOrbit(-ORBIT_STEP_THETA, 0));
+    document.querySelector('[data-orbit="right"]').addEventListener('click', () => nudgeOrbit(ORBIT_STEP_THETA, 0));
+    document.querySelector('[data-orbit="up"]').addEventListener('click', () => nudgeOrbit(0, -ORBIT_STEP_PHI));
+    document.querySelector('[data-orbit="down"]').addEventListener('click', () => nudgeOrbit(0, ORBIT_STEP_PHI));
 
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
