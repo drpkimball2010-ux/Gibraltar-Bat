@@ -719,16 +719,10 @@
       wctx.fillStyle = '#2a1a10';
       wctx.textAlign = 'center';
       wctx.textBaseline = 'middle';
-      // Reversing the character order (each glyph still drawn upright, just
-      // repositioned) — not mirroring the rendering — means that reading
-      // from the label end toward the cap spells the phrase forward
-      // ("Handcrafted For"), matching the requested beginning-near-label,
-      // end-near-cap orientation without flipping any letters.
-      const reverse = (s) => s.split('').reverse().join('');
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText(reverse('Handcrafted For'), w / 2, h * 0.34);
+      wctx.fillText('Handcrafted For', w / 2, h * 0.34);
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(reverse(modelName), w / 2, h * 0.72);
+      wctx.fillText(modelName, w / 2, h * 0.72);
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
