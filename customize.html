@@ -10,7 +10,6 @@
     body { overflow: hidden; }
 
     .config-wrap {
-      position: relative;
       display: flex;
       height: calc(100vh - 70px);
     }
@@ -21,37 +20,6 @@
       cursor: grab;
     }
     #bat-canvas:active { cursor: grabbing; }
-
-    .orbit-pad {
-      position: absolute;
-      left: 20px;
-      bottom: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 36px);
-      grid-template-rows: repeat(3, 36px);
-      gap: 4px;
-      z-index: 5;
-    }
-    .orbit-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(11, 26, 46, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 6px;
-      color: #fff;
-      font-size: 0.95rem;
-      line-height: 1;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .orbit-btn:hover  { background: rgba(212, 164, 0, 0.55); border-color: var(--gold); }
-    .orbit-btn:active { background: rgba(212, 164, 0, 0.85); }
-    .orbit-up    { grid-column: 2; grid-row: 1; }
-    .orbit-left  { grid-column: 1; grid-row: 2; }
-    .orbit-right { grid-column: 3; grid-row: 2; }
-    .orbit-down  { grid-column: 2; grid-row: 3; }
 
     .config-panel {
       width: 280px;
@@ -290,11 +258,6 @@
       body { overflow: auto; }
       .config-wrap { flex-direction: column; height: auto; }
       #bat-canvas { width: 100%; height: 65vw; min-height: 320px; }
-      .orbit-pad {
-        left: 12px;
-        bottom: auto;
-        top: calc(max(65vw, 320px) - 128px);
-      }
       .config-panel {
         width: 100%;
         border-left: none;
@@ -325,13 +288,6 @@
 
   <div class="config-wrap">
     <canvas id="bat-canvas"></canvas>
-
-    <div class="orbit-pad" aria-label="Rotate bat view">
-      <button type="button" class="orbit-btn orbit-up" data-orbit="up" aria-label="Tilt up">▲</button>
-      <button type="button" class="orbit-btn orbit-left" data-orbit="left" aria-label="Rotate left">◀</button>
-      <button type="button" class="orbit-btn orbit-right" data-orbit="right" aria-label="Rotate right">▶</button>
-      <button type="button" class="orbit-btn orbit-down" data-orbit="down" aria-label="Tilt down">▼</button>
-    </div>
 
     <aside class="config-panel">
       <h2>Design Your Bat</h2>
@@ -471,93 +427,6 @@
     controls.minDistance   = 3.0;
     controls.maxDistance   = 12.0;
     controls.target.set(0, 0, 0);
-
-    // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
-    const ORBIT_SPEED_THETA = Math.PI * 0.85; // radians/sec while held (~153°/s)
-    const ORBIT_SPEED_PHI   = Math.PI * 0.65; // radians/sec while held (~117°/s)
-    const WORLD_UP = new THREE.Vector3(0, 1, 0);
-
-    // Left/right always re-reads the camera's actual current position, so it
-    // naturally stays correct after a drag or scroll-zoom — no persisted copy
-    // to go stale.
-    function nudgeTheta(deltaTheta) {
-      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.theta += deltaTheta;
-      offset.setFromSpherical(spherical);
-      camera.position.copy(controls.target).add(offset);
-    }
-
-    // Up/down can't use the same theta/phi approach: THREE.Spherical always
-    // reports phi canonicalized to [0, π] (it comes from acos), so pushing
-    // past 0 or π just reflects to the opposite azimuth instead of truly
-    // continuing — it stalls or flips in place at the pole rather than
-    // spinning through. Instead, each hold rotates the actual offset vector
-    // around a fixed horizontal axis established once at the start of that
-    // gesture (recomputing it every frame is what caused the flip, since it
-    // degenerates exactly at the poles). A fixed-axis rotation has no such
-    // singularity, so it can spin indefinitely in one consistent direction.
-    let pitchAxis = null;
-
-    function beginPitchGesture() {
-      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      pitchAxis = new THREE.Vector3().crossVectors(offset, WORLD_UP);
-      if (pitchAxis.lengthSq() < 1e-8) pitchAxis.set(1, 0, 0);
-      pitchAxis.normalize();
-    }
-
-    function nudgePhi(deltaPhi) {
-      if (!pitchAxis) beginPitchGesture();
-      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      offset.applyAxisAngle(pitchAxis, deltaPhi);
-      camera.position.copy(controls.target).add(offset);
-    }
-
-    // Note: neither nudge function calls controls.update() — the main render
-    // loop already calls it once per frame. Calling it again here made it run
-    // twice per frame while a button was held, double-applying OrbitControls'
-    // own damped drag momentum and fighting with (or undoing) whatever the
-    // last mouse drag had done.
-
-    // Drives rotation from a requestAnimationFrame loop scaled by real elapsed
-    // time, so held movement rides the render framerate instead of jumping in
-    // visible steps the way a setInterval-based repeat would.
-    function bindOrbitHold(selector, applyDelta, onStart) {
-      const btn = document.querySelector(selector);
-      let holding = false;
-      let lastTime = 0;
-
-      function frame(now) {
-        if (!holding) return;
-        const dt = Math.min((now - lastTime) / 1000, 0.1);
-        lastTime = now;
-        applyDelta(dt);
-        requestAnimationFrame(frame);
-      }
-
-      function start(e) {
-        e.preventDefault();
-        if (holding) return;
-        holding = true;
-        if (onStart) onStart();
-        lastTime = performance.now();
-        requestAnimationFrame(frame);
-      }
-
-      function stop() {
-        holding = false;
-        pitchAxis = null;
-      }
-
-      btn.addEventListener('pointerdown', start);
-      ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt => btn.addEventListener(evt, stop));
-      window.addEventListener('pointerup', stop);
-    }
-
-    bindOrbitHold('[data-orbit="left"]',  (dt) => nudgeTheta(-ORBIT_SPEED_THETA * dt));
-    bindOrbitHold('[data-orbit="right"]', (dt) => nudgeTheta(ORBIT_SPEED_THETA * dt));
-    bindOrbitHold('[data-orbit="up"]',    (dt) => nudgePhi(ORBIT_SPEED_PHI * dt), beginPitchGesture);
-    bindOrbitHold('[data-orbit="down"]',  (dt) => nudgePhi(-ORBIT_SPEED_PHI * dt), beginPitchGesture);
 
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
