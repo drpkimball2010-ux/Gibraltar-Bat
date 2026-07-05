@@ -523,20 +523,30 @@
       polygonOffsetFactor: -4,
       polygonOffsetUnits: -4,
     });
+    const engravingMat = new THREE.MeshStandardMaterial({
+      transparent: true,
+      roughness: 0.6,
+      metalness: 0.02,
+      alphaTest: 0.05,
+      polygonOffset: true,
+      polygonOffsetFactor: -4,
+      polygonOffsetUnits: -4,
+    });
 
     // ─── Bat group ───────────────────────────────────────────────────────────
     const bat = new THREE.Group();
     scene.add(bat);
 
-    const handleMesh  = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
-    const barrelMesh  = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
-    const capMesh     = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
-    const knobCapMesh = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
-    const labelMesh    = new THREE.Mesh(new THREE.BufferGeometry(), labelMat);
+    const handleMesh     = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
+    const barrelMesh     = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
+    const capMesh        = new THREE.Mesh(new THREE.BufferGeometry(), barrelMat);
+    const knobCapMesh    = new THREE.Mesh(new THREE.BufferGeometry(), handleMat);
+    const labelMesh      = new THREE.Mesh(new THREE.BufferGeometry(), labelMat);
+    const engravingMesh  = new THREE.Mesh(new THREE.BufferGeometry(), engravingMat);
     handleMesh.castShadow = true;
     barrelMesh.castShadow = true;
     labelMesh.visible = false;
-    bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh, labelMesh);
+    bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh, labelMesh, engravingMesh);
 
     // ─── State ───────────────────────────────────────────────────────────────
     let batType     = 'sweetspot';
@@ -636,9 +646,13 @@
       return yScaled < profilePts[0].y ? profilePts[0].x : profilePts[profilePts.length - 1].x;
     }
 
-    function buildLabelGeometry(profilePts, mid, S, yTopFace) {
-      const yTop = yTopFace - LABEL_TOP_IN;
-      const yBot = yTop - LABEL_HEIGHT_IN;
+    // Generic curved-decal geometry builder: a thin partial-lathe strip that
+    // hugs the true barrel/handle profile (taper included) at any bat length.
+    // topIn/heightIn position the strip along the bat's length (V axis);
+    // widthIn sets its angular wrap around the circumference (U axis).
+    function buildDecalGeometry(profilePts, mid, S, yTopFace, topIn, heightIn, widthIn) {
+      const yTop = yTopFace - topIn;
+      const yBot = yTop - heightIn;
       const N = 24;
       const pts = [];
       for (let i = 0; i <= N; i++) {
@@ -648,8 +662,16 @@
       }
       const rMidScaled = interpRadius(profilePts, (yTop + yBot) / 2, mid, S);
       const rMidInches  = rMidScaled / S;
-      const phiLength    = LABEL_WIDTH_IN / rMidInches;
+      const phiLength    = widthIn / rMidInches;
       return new THREE.LatheGeometry(pts, 24, -phiLength / 2, phiLength);
+    }
+
+    function buildLabelGeometry(profilePts, mid, S, yTopFace) {
+      return buildDecalGeometry(profilePts, mid, S, yTopFace, LABEL_TOP_IN, LABEL_HEIGHT_IN, LABEL_WIDTH_IN);
+    }
+
+    function buildEngravingGeometry(profilePts, mid, S, yTopFace) {
+      return buildDecalGeometry(profilePts, mid, S, yTopFace, ENGRAVING_TOP_IN, ENGRAVING_HEIGHT_IN, ENGRAVING_WIDTH_IN);
     }
 
     labelImg.onload = () => {
@@ -660,6 +682,54 @@
       rebuildBat();
     };
     labelImg.src = 'images/label-logo.png';
+
+    // ─── "Handcrafted For [Model]" engraving ──────────────────────────────────
+    // Positioned near the tip, ahead of the label, and always present (not a
+    // customer-facing option). Text is drawn on a wide canvas in its natural
+    // reading orientation, then rotated 90° the same way the label image is,
+    // so it runs along the bat's length and reads level when held sideways.
+    const ENGRAVING_TOP_IN    = 2;    // distance from tip to the engraving's near edge
+    const ENGRAVING_HEIGHT_IN = 4.5;  // engraving span along the bat's length (its "reading width")
+    const ENGRAVING_WIDTH_IN  = 4.5 * (500 / 900); // wrap around the barrel (its "reading height")
+    const ENGRAVING_MODEL_NAMES = {
+      standard:  'Standard Model',
+      torpedo:   'Torpedo Model',
+      sweetspot: 'Sweet Spot Model',
+      fungo:     'Fungo Model',
+    };
+    const engravingTexture = new THREE.CanvasTexture(document.createElement('canvas'));
+
+    function updateEngravingTexture() {
+      const modelName = ENGRAVING_MODEL_NAMES[batType] || 'Standard Model';
+      const w = 900, h = 500;
+      const wide = document.createElement('canvas');
+      wide.width = w;
+      wide.height = h;
+      const wctx = wide.getContext('2d');
+      wctx.clearRect(0, 0, w, h);
+      wctx.fillStyle = '#2a1a10';
+      wctx.textAlign = 'center';
+      wctx.textBaseline = 'middle';
+      wctx.font = '700 68px Georgia, "Times New Roman", serif';
+      wctx.fillText('Handcrafted For', w / 2, h * 0.34);
+      wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
+      wctx.fillText(modelName, w / 2, h * 0.72);
+
+      const rotated = document.createElement('canvas');
+      rotated.width = h;
+      rotated.height = w;
+      const rctx = rotated.getContext('2d');
+      rctx.translate(rotated.width / 2, rotated.height / 2);
+      rctx.rotate(Math.PI / 2);
+      rctx.drawImage(wide, -w / 2, -h / 2);
+
+      engravingTexture.image = rotated;
+      engravingTexture.needsUpdate = true;
+      engravingMat.map = engravingTexture;
+      engravingMat.color.setHex(0xffffff);
+      engravingMat.needsUpdate = true;
+    }
+    updateEngravingTexture();
 
     const PRICES = {
       standard:  { maple: 145, birch: 130, ash: 85 },
@@ -768,6 +838,8 @@
 
       labelMesh.geometry.dispose();
       labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
+      engravingMesh.geometry.dispose();
+      engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Torpedo bat geometry ────────────────────────────────────────────────
@@ -859,6 +931,8 @@
 
       labelMesh.geometry.dispose();
       labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
+      engravingMesh.geometry.dispose();
+      engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Fungo bat geometry ──────────────────────────────────────────────────
@@ -948,6 +1022,8 @@
 
       labelMesh.geometry.dispose();
       labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
+      engravingMesh.geometry.dispose();
+      engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Sweet Spot bat geometry ─────────────────────────────────────────────
@@ -1026,6 +1102,8 @@
 
       labelMesh.geometry.dispose();
       labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
+      engravingMesh.geometry.dispose();
+      engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
     // ─── Dispatcher ──────────────────────────────────────────────────────────
@@ -1068,6 +1146,7 @@
         document.getElementById('wood-group').style.display         = batType === 'fungo' ? 'none' : '';
         document.getElementById('grade-group').style.display        = batType === 'fungo' ? 'none' : '';
         updatePrice();
+        updateEngravingTexture();
         rebuildBat();
       });
     });
