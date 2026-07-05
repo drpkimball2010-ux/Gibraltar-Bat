@@ -577,19 +577,32 @@
     bindOrbitHold('[data-orbit="up"]',    (dt) => nudgePhi(-ORBIT_SPEED_PHI * dt));
     bindOrbitHold('[data-orbit="down"]',  (dt) => nudgePhi(ORBIT_SPEED_PHI * dt));
 
-    // ─── Recenter + rotate 90° button ─────────────────────────────────────────
-    // Snaps the tilt and zoom back to their defaults while advancing the
-    // current azimuth by a quarter turn, animated smoothly rather than
-    // snapping instantly.
-    const DEFAULT_RADIUS = 6.0;
+    // ─── Recenter + rotate vertical↔horizontal button ────────────────────────
+    // Each click toggles the bat itself between standing vertical and lying
+    // horizontal (rotating the whole bat group, so the label rotates with
+    // it), while also snapping the camera framing back to its clean default
+    // view — both animated smoothly together rather than snapping instantly.
+    const DEFAULT_RADIUS = Math.sqrt(0.35 * 0.35 + 6.0 * 6.0);
     const DEFAULT_PHI    = Math.PI / 2;
+    const DEFAULT_THETA  = Math.atan2(0.35, 6.0);
     let recenterAnimId = null;
+    let batHorizontal = false;
 
     function animateRecenterRotate() {
       if (recenterAnimId) return; // ignore taps while one is already in progress
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
       const start = new THREE.Spherical().setFromVector3(offset);
-      const end = new THREE.Spherical(DEFAULT_RADIUS, DEFAULT_PHI, start.theta + Math.PI / 2);
+
+      // Take the shortest path back to the default azimuth rather than
+      // unwinding however many full turns of drag/arrow rotation happened.
+      const rawDelta = DEFAULT_THETA - start.theta;
+      const shortestDelta = ((rawDelta + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+      const end = new THREE.Spherical(DEFAULT_RADIUS, DEFAULT_PHI, start.theta + shortestDelta);
+
+      const startBatZ = bat.rotation.z;
+      batHorizontal = !batHorizontal;
+      const endBatZ = batHorizontal ? Math.PI / 2 : 0;
+
       const duration = 500;
       const startTime = performance.now();
 
@@ -605,6 +618,7 @@
         const theta  = start.theta + (end.theta - start.theta) * eased;
         const stepOffset = new THREE.Vector3().setFromSphericalCoords(radius, phi, theta);
         camera.position.copy(controls.target).add(stepOffset);
+        bat.rotation.z = startBatZ + (endBatZ - startBatZ) * eased;
         if (t < 1) {
           recenterAnimId = requestAnimationFrame(step);
         } else {
