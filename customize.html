@@ -475,40 +475,54 @@
     // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
     const ORBIT_SPEED_THETA = Math.PI * 0.85; // radians/sec while held (~153°/s)
     const ORBIT_SPEED_PHI   = Math.PI * 0.65; // radians/sec while held (~117°/s)
+    const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-    // THREE.Spherical always reports phi canonicalized to [0, π] (it comes
-    // from acos), so re-deriving it from the camera position every frame and
-    // accumulating past 0 or π just reflects to the opposite azimuth instead
-    // of truly continuing — it oscillates in place at the pole rather than
-    // spinning through. Instead we keep our own persistent, unbounded theta/
-    // phi that we only resync from the actual camera position once at the
-    // start of a gesture (so it stays correct after a mouse drag), and drive
-    // the position forward every frame via raw setFromSphericalCoords, which
-    // has no range restriction and composes correctly through the poles.
-    let orbitRadius = 6.0;
-    let orbitTheta  = 0;
-    let orbitPhi    = Math.PI / 2;
-
-    function syncOrbitFromCamera() {
+    // Left/right always re-reads the camera's actual current position, so it
+    // naturally stays correct after a drag or scroll-zoom — no persisted copy
+    // to go stale.
+    function nudgeTheta(deltaTheta) {
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
       const spherical = new THREE.Spherical().setFromVector3(offset);
-      orbitRadius = spherical.radius;
-      orbitTheta  = spherical.theta;
-      orbitPhi    = spherical.phi;
+      spherical.theta += deltaTheta;
+      offset.setFromSpherical(spherical);
+      camera.position.copy(controls.target).add(offset);
     }
 
-    function nudgeOrbit(deltaTheta, deltaPhi) {
-      orbitTheta += deltaTheta;
-      orbitPhi   += deltaPhi;
-      const offset = new THREE.Vector3().setFromSphericalCoords(orbitRadius, orbitPhi, orbitTheta);
-      camera.position.copy(controls.target).add(offset);
-      controls.update();
+    // Up/down can't use the same theta/phi approach: THREE.Spherical always
+    // reports phi canonicalized to [0, π] (it comes from acos), so pushing
+    // past 0 or π just reflects to the opposite azimuth instead of truly
+    // continuing — it stalls or flips in place at the pole rather than
+    // spinning through. Instead, each hold rotates the actual offset vector
+    // around a fixed horizontal axis established once at the start of that
+    // gesture (recomputing it every frame is what caused the flip, since it
+    // degenerates exactly at the poles). A fixed-axis rotation has no such
+    // singularity, so it can spin indefinitely in one consistent direction.
+    let pitchAxis = null;
+
+    function beginPitchGesture() {
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      pitchAxis = new THREE.Vector3().crossVectors(offset, WORLD_UP);
+      if (pitchAxis.lengthSq() < 1e-8) pitchAxis.set(1, 0, 0);
+      pitchAxis.normalize();
     }
+
+    function nudgePhi(deltaPhi) {
+      if (!pitchAxis) beginPitchGesture();
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      offset.applyAxisAngle(pitchAxis, deltaPhi);
+      camera.position.copy(controls.target).add(offset);
+    }
+
+    // Note: neither nudge function calls controls.update() — the main render
+    // loop already calls it once per frame. Calling it again here made it run
+    // twice per frame while a button was held, double-applying OrbitControls'
+    // own damped drag momentum and fighting with (or undoing) whatever the
+    // last mouse drag had done.
 
     // Drives rotation from a requestAnimationFrame loop scaled by real elapsed
     // time, so held movement rides the render framerate instead of jumping in
     // visible steps the way a setInterval-based repeat would.
-    function bindOrbitHold(selector, getDelta) {
+    function bindOrbitHold(selector, applyDelta, onStart) {
       const btn = document.querySelector(selector);
       let holding = false;
       let lastTime = 0;
@@ -517,8 +531,7 @@
         if (!holding) return;
         const dt = Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
-        const { deltaTheta, deltaPhi } = getDelta(dt);
-        nudgeOrbit(deltaTheta, deltaPhi);
+        applyDelta(dt);
         requestAnimationFrame(frame);
       }
 
@@ -526,13 +539,14 @@
         e.preventDefault();
         if (holding) return;
         holding = true;
-        syncOrbitFromCamera();
+        if (onStart) onStart();
         lastTime = performance.now();
         requestAnimationFrame(frame);
       }
 
       function stop() {
         holding = false;
+        pitchAxis = null;
       }
 
       btn.addEventListener('pointerdown', start);
@@ -540,10 +554,10 @@
       window.addEventListener('pointerup', stop);
     }
 
-    bindOrbitHold('[data-orbit="left"]',  (dt) => ({ deltaTheta: -ORBIT_SPEED_THETA * dt, deltaPhi: 0 }));
-    bindOrbitHold('[data-orbit="right"]', (dt) => ({ deltaTheta:  ORBIT_SPEED_THETA * dt, deltaPhi: 0 }));
-    bindOrbitHold('[data-orbit="up"]',    (dt) => ({ deltaTheta: 0, deltaPhi: -ORBIT_SPEED_PHI * dt }));
-    bindOrbitHold('[data-orbit="down"]',  (dt) => ({ deltaTheta: 0, deltaPhi:  ORBIT_SPEED_PHI * dt }));
+    bindOrbitHold('[data-orbit="left"]',  (dt) => nudgeTheta(-ORBIT_SPEED_THETA * dt));
+    bindOrbitHold('[data-orbit="right"]', (dt) => nudgeTheta(ORBIT_SPEED_THETA * dt));
+    bindOrbitHold('[data-orbit="up"]',    (dt) => nudgePhi(ORBIT_SPEED_PHI * dt), beginPitchGesture);
+    bindOrbitHold('[data-orbit="down"]',  (dt) => nudgePhi(-ORBIT_SPEED_PHI * dt), beginPitchGesture);
 
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
