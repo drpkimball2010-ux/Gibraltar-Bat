@@ -402,10 +402,10 @@
     controls.target.set(0, 0, 0);
 
     // ─── Orbit arrow pad (simple alternative to click-and-drag) ──────────────
-    const ORBIT_STEP_THETA = Math.PI / 18; // 10° per click
-    const ORBIT_STEP_PHI   = Math.PI / 24; // 7.5° per click
-    const ORBIT_PHI_MIN    = 0.15;
-    const ORBIT_PHI_MAX    = Math.PI - 0.15;
+    const ORBIT_SPEED_THETA = Math.PI / 3; // radians/sec while held (~60°/s)
+    const ORBIT_SPEED_PHI   = Math.PI / 4; // radians/sec while held (~45°/s)
+    const ORBIT_PHI_MIN     = 0.15;
+    const ORBIT_PHI_MAX     = Math.PI - 0.15;
 
     function nudgeOrbit(deltaTheta, deltaPhi) {
       const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
@@ -417,34 +417,44 @@
       controls.update();
     }
 
-    function bindOrbitHold(selector, fn) {
+    // Drives rotation from a requestAnimationFrame loop scaled by real elapsed
+    // time, so held movement rides the render framerate instead of jumping in
+    // visible steps the way a setInterval-based repeat would.
+    function bindOrbitHold(selector, getDelta) {
       const btn = document.querySelector(selector);
-      let holdTimeout = null;
-      let holdInterval = null;
+      let holding = false;
+      let lastTime = 0;
 
-      function stop() {
-        clearTimeout(holdTimeout);
-        clearInterval(holdInterval);
-        holdTimeout = null;
-        holdInterval = null;
+      function frame(now) {
+        if (!holding) return;
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+        const { deltaTheta, deltaPhi } = getDelta(dt);
+        nudgeOrbit(deltaTheta, deltaPhi);
+        requestAnimationFrame(frame);
       }
 
-      btn.addEventListener('pointerdown', (e) => {
+      function start(e) {
         e.preventDefault();
-        fn();
-        holdTimeout = setTimeout(() => {
-          holdInterval = setInterval(fn, 90);
-        }, 350);
-      });
+        if (holding) return;
+        holding = true;
+        lastTime = performance.now();
+        requestAnimationFrame(frame);
+      }
 
+      function stop() {
+        holding = false;
+      }
+
+      btn.addEventListener('pointerdown', start);
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt => btn.addEventListener(evt, stop));
       window.addEventListener('pointerup', stop);
     }
 
-    bindOrbitHold('[data-orbit="left"]',  () => nudgeOrbit(-ORBIT_STEP_THETA, 0));
-    bindOrbitHold('[data-orbit="right"]', () => nudgeOrbit(ORBIT_STEP_THETA, 0));
-    bindOrbitHold('[data-orbit="up"]',    () => nudgeOrbit(0, -ORBIT_STEP_PHI));
-    bindOrbitHold('[data-orbit="down"]',  () => nudgeOrbit(0, ORBIT_STEP_PHI));
+    bindOrbitHold('[data-orbit="left"]',  (dt) => ({ deltaTheta: -ORBIT_SPEED_THETA * dt, deltaPhi: 0 }));
+    bindOrbitHold('[data-orbit="right"]', (dt) => ({ deltaTheta:  ORBIT_SPEED_THETA * dt, deltaPhi: 0 }));
+    bindOrbitHold('[data-orbit="up"]',    (dt) => ({ deltaTheta: 0, deltaPhi: -ORBIT_SPEED_PHI * dt }));
+    bindOrbitHold('[data-orbit="down"]',  (dt) => ({ deltaTheta: 0, deltaPhi:  ORBIT_SPEED_PHI * dt }));
 
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
