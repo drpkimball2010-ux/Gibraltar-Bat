@@ -221,6 +221,71 @@
     }
     .btn-add-cart:hover { background: var(--navy); color: white; }
 
+    .preview-float {
+      display: none;
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      width: 128px;
+      height: 128px;
+      background: rgba(11, 26, 46, 0.92);
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      z-index: 50;
+      overflow: hidden;
+    }
+    .preview-float.visible { display: block; }
+    .preview-float canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .preview-float-close {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .preview-float-reopen {
+      display: none;
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 20px;
+      padding: 0.55rem 1rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .preview-float-reopen.visible { display: block; }
+
+    @media (min-width: 641px) {
+      .preview-float, .preview-float-reopen { display: none !important; }
+    }
+
     @media (max-width: 640px) {
       body { overflow: auto; }
       .config-wrap { flex-direction: column; height: auto; }
@@ -357,6 +422,12 @@
       <button class="btn-add-cart" id="btn-add-cart">Add to Cart</button>
     </aside>
   </div>
+
+  <div class="preview-float" id="preview-float">
+    <button class="preview-float-close" id="preview-float-close" aria-label="Hide preview">✕</button>
+    <canvas id="preview-float-canvas"></canvas>
+  </div>
+  <button class="preview-float-reopen" id="preview-float-reopen" aria-label="Show bat preview">Preview</button>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -1161,11 +1232,67 @@
     window.addEventListener('resize', onResize);
     onResize();
 
+    // ─── Floating mobile preview ──────────────────────────────────────────────
+    // On narrow screens, once the main canvas scrolls out of view while the
+    // shopper is working through the options below, a small live mirror of
+    // the same scene/camera pops up in the corner so they don't have to keep
+    // scrolling back up to see their changes.
+    const previewFloat    = document.getElementById('preview-float');
+    const previewReopen   = document.getElementById('preview-float-reopen');
+    const previewCanvas   = document.getElementById('preview-float-canvas');
+    const previewClose    = document.getElementById('preview-float-close');
+
+    const previewRenderer = new THREE.WebGLRenderer({ canvas: previewCanvas, antialias: true });
+    previewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    previewRenderer.outputEncoding = THREE.sRGBEncoding;
+    previewRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    previewRenderer.toneMappingExposure = 0.72;
+
+    const previewCamera = camera.clone();
+
+    let previewOutOfView = false;
+    let previewCollapsed = false;
+
+    function updatePreviewVisibility() {
+      const isMobile   = window.innerWidth <= 640;
+      const shouldShow = previewOutOfView && !previewCollapsed && isMobile;
+      previewFloat.classList.toggle('visible', shouldShow);
+      previewReopen.classList.toggle('visible', previewOutOfView && previewCollapsed && isMobile);
+      if (shouldShow) {
+        const size = previewCanvas.clientWidth || 124;
+        previewRenderer.setSize(size, size, false);
+        previewCamera.aspect = 1;
+        previewCamera.updateProjectionMatrix();
+      }
+    }
+
+    new IntersectionObserver((entries) => {
+      previewOutOfView = !entries[0].isIntersecting;
+      if (!previewOutOfView) previewCollapsed = false; // fresh next time it scrolls away
+      updatePreviewVisibility();
+    }, { threshold: 0 }).observe(canvas);
+
+    previewClose.addEventListener('click', () => {
+      previewCollapsed = true;
+      updatePreviewVisibility();
+    });
+    previewReopen.addEventListener('click', () => {
+      previewCollapsed = false;
+      updatePreviewVisibility();
+    });
+    window.addEventListener('resize', updatePreviewVisibility);
+
     // ─── Render loop ─────────────────────────────────────────────────────────
     (function loop() {
       requestAnimationFrame(loop);
       controls.update();
       renderer.render(scene, camera);
+
+      if (previewFloat.classList.contains('visible')) {
+        previewCamera.position.copy(camera.position);
+        previewCamera.quaternion.copy(camera.quaternion);
+        previewRenderer.render(scene, previewCamera);
+      }
     })();
 
     // ─── Color swatches ──────────────────────────────────────────────────────
