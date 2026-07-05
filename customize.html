@@ -121,6 +121,7 @@
       cursor: not-allowed;
     }
     .swatch:disabled:hover { transform: none; }
+    .swatch[data-color="natural"] { background: #C8A96E; }
     .swatch[data-color="white"]   { background: #EEEAE0; border: 1.5px solid #ccc; }
     .swatch[data-color="walnut"]  { background: #4A2810; }
     .swatch[data-color="red"]     { background: #CC0000; }
@@ -286,13 +287,13 @@
       <div class="config-group">
         <label>Barrel Color</label>
         <div class="swatches" id="barrel-swatches"></div>
-        <div class="color-name" id="barrel-name">White</div>
+        <div class="color-name" id="barrel-name">Natural</div>
       </div>
 
       <div class="config-group">
         <label>Handle Color</label>
         <div class="swatches" id="handle-swatches"></div>
-        <div class="color-name" id="handle-name">White</div>
+        <div class="color-name" id="handle-name">Natural</div>
       </div>
 
       <div class="config-group">
@@ -413,6 +414,7 @@
     }
 
     const COLORS = {
+      natural: { label: 'Natural', hex: 0xC8A96E, roughness: 0.78, metalness: 0.04 },
       white:   { label: 'White',   hex: 0xEEEAE0, roughness: 0.25, metalness: 0.05 },
       walnut:  { label: 'Walnut',  hex: 0x4A2810, roughness: 0.72, metalness: 0.04 },
       red:     { label: 'Red',     hex: 0xCC0000, roughness: 0.62, metalness: 0.04 },
@@ -430,10 +432,10 @@
     COLORS.striped.texture = createStripedTexture();
 
     const handleMat = new THREE.MeshStandardMaterial({
-      color: COLORS.white.hex, roughness: COLORS.white.roughness, metalness: COLORS.white.metalness,
+      color: COLORS.natural.hex, roughness: COLORS.natural.roughness, metalness: COLORS.natural.metalness,
     });
     const barrelMat = new THREE.MeshStandardMaterial({
-      color: COLORS.white.hex, roughness: COLORS.white.roughness, metalness: COLORS.white.metalness,
+      color: COLORS.natural.hex, roughness: COLORS.natural.roughness, metalness: COLORS.natural.metalness,
     });
     const labelMat = new THREE.MeshStandardMaterial({
       transparent: true,
@@ -468,13 +470,13 @@
 
     let grade       = 'standard';
 
-    let barrelColorKey = 'white';
+    let barrelColorKey = 'natural';
     let labelColorKey  = 'black';
 
     // ─── Label decal ─────────────────────────────────────────────────────────
     // Runs 6"–12" from the tip of the bat, sized from the source art's aspect
     // ratio once rotated 90° so it reads level when the bat is held sideways.
-    const LABEL_COLOR_KEYS = Object.keys(COLORS).filter(k => k !== 'striped');
+    const LABEL_COLOR_KEYS = Object.keys(COLORS).filter(k => k !== 'striped' && k !== 'natural');
     const LABEL_TOP_IN    = 8;      // distance from tip to the label's top edge
     const LABEL_HEIGHT_IN = 3.25;   // label span, top edge to bottom edge
     let LABEL_WIDTH_IN    = 3.25 * (312 / 544); // refined once the source image loads
@@ -1101,14 +1103,14 @@
       updateLabelSwatchAvailability();
     }
 
-    buildSwatches('barrel-swatches', 'barrel-name', barrelMat, 'white', (key) => {
+    buildSwatches('barrel-swatches', 'barrel-name', barrelMat, 'natural', (key) => {
       barrelColorKey = key;
       updateLabelSwatchAvailability();
       if (labelColorKey === key) {
         applyLabelColor(pickFallbackLabelColor(key));
       }
     });
-    buildSwatches('handle-swatches', 'handle-name', handleMat, 'white');
+    buildSwatches('handle-swatches', 'handle-name', handleMat, 'natural');
     buildLabelSwatches();
   </script>
 
