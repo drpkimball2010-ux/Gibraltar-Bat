@@ -297,7 +297,7 @@
 
     <aside class="config-panel">
       <h2>Design Your Bat</h2>
-      <p class="config-hint">Drag to rotate &nbsp;&middot;&nbsp; Scroll to zoom</p>
+      <p class="config-hint">Drag to move &nbsp;&middot;&nbsp; Scroll to zoom</p>
 
       <hr class="config-divider" />
 
@@ -434,20 +434,51 @@
     controls.maxDistance   = 12.0;
     controls.target.set(0, 0, 0);
 
-    // Trackpad two-finger swipes fire as 'wheel' events with both deltaX and
-    // deltaY, not as a mouse drag. OrbitControls' own wheel handler only ever
-    // reads deltaY (to zoom) and silently ignores deltaX entirely — so a
-    // horizontal-only trackpad swipe did nothing. The horizontal component
-    // pans the view (slides camera + target sideways together) — it must
-    // NOT rotate/spin the bat; only click-and-drag does that.
-    const WHEEL_PAN_SPEED = 0.006; // world units per pixel of horizontal wheel delta
+    // No rotation option at all, by design — click-drag and trackpad swipe
+    // both pan (translate camera + target together); only scroll/pinch
+    // zooms. OrbitControls still handles zoom; its own rotate is disabled
+    // and both drag and wheel are reimplemented here as pure panning.
+    controls.enableRotate = false;
+    const PAN_SPEED = 0.006; // world units per pixel of movement
+
+    function panBy(dx, dy) {
+      const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+      const up    = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+      const offset = new THREE.Vector3()
+        .addScaledVector(right, -dx * PAN_SPEED)
+        .addScaledVector(up, dy * PAN_SPEED);
+      camera.position.add(offset);
+      controls.target.add(offset);
+    }
+
+    // Trackpad two-finger swipes fire as 'wheel' events (deltaX/deltaY), not
+    // a mouse drag — OrbitControls' own wheel handler only reads deltaY (for
+    // zoom) and ignores deltaX entirely, so a horizontal-only swipe used to
+    // do nothing.
     canvas.addEventListener('wheel', (event) => {
       if (Math.abs(event.deltaX) < 1e-3) return;
-      const panRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
-      panRight.multiplyScalar(-event.deltaX * WHEEL_PAN_SPEED);
-      camera.position.add(panRight);
-      controls.target.add(panRight);
+      panBy(event.deltaX, 0);
     }, { passive: true });
+
+    let dragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastPointerX;
+      const dy = e.clientY - lastPointerY;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      panBy(dx, dy);
+    });
+    ['pointerup', 'pointercancel'].forEach(evt => canvas.addEventListener(evt, () => { dragging = false; }));
 
     // ─── Lighting ────────────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.18));
