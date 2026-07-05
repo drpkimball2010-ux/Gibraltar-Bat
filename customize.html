@@ -437,17 +437,16 @@
     // Trackpad two-finger swipes fire as 'wheel' events with both deltaX and
     // deltaY, not as a mouse drag. OrbitControls' own wheel handler only ever
     // reads deltaY (to zoom) and silently ignores deltaX entirely — so a
-    // horizontal-only trackpad swipe does nothing. This adds azimuthal
-    // rotation from the horizontal component, alongside (not replacing)
-    // OrbitControls' existing zoom-on-vertical-swipe and click-drag rotate.
-    const WHEEL_ROTATE_SPEED = 0.0025; // radians per pixel of horizontal wheel delta
+    // horizontal-only trackpad swipe did nothing. The horizontal component
+    // pans the view (slides camera + target sideways together) — it must
+    // NOT rotate/spin the bat; only click-and-drag does that.
+    const WHEEL_PAN_SPEED = 0.006; // world units per pixel of horizontal wheel delta
     canvas.addEventListener('wheel', (event) => {
       if (Math.abs(event.deltaX) < 1e-3) return;
-      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
-      const spherical = new THREE.Spherical().setFromVector3(offset);
-      spherical.theta -= event.deltaX * WHEEL_ROTATE_SPEED;
-      offset.setFromSpherical(spherical);
-      camera.position.copy(controls.target).add(offset);
+      const panRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+      panRight.multiplyScalar(-event.deltaX * WHEEL_PAN_SPEED);
+      camera.position.add(panRight);
+      controls.target.add(panRight);
     }, { passive: true });
 
     // ─── Lighting ────────────────────────────────────────────────────────────
