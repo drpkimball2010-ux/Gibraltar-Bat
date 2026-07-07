@@ -720,9 +720,9 @@
       wctx.textAlign = 'center';
       wctx.textBaseline = 'middle';
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText('Handcrafted For', w / 2, h * 0.33);
+      wctx.fillText('Handcrafted For', w / 2, h * 0.13);
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(modelName, w / 2, h * 0.47);
+      wctx.fillText(modelName, w / 2, h * 0.67);
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
@@ -730,7 +730,6 @@
       const rctx = rotated.getContext('2d');
       rctx.translate(rotated.width / 2, rotated.height / 2);
       rctx.rotate(Math.PI / 2);
-      rctx.scale(-1, 1);
       rctx.drawImage(wide, -w / 2, -h / 2);
 
       engravingTexture.image = rotated;
