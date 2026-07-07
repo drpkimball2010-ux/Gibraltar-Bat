@@ -719,10 +719,13 @@
       wctx.fillStyle = '#2a1a10';
       wctx.textAlign = 'center';
       wctx.textBaseline = 'middle';
+      // Reversed so the "H" lands at the end nearer the logo once rotated
+      // onto the barrel, instead of the end nearer the cap.
+      const handcraftedReversed = 'Handcrafted For'.split('').reverse().join('');
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText('Handcrafted For', w / 2, h * 0.13);
+      wctx.fillText(handcraftedReversed, w / 2, h * 0.67);
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(modelName, w / 2, h * 0.67);
+      wctx.fillText(modelName, w / 2, h * 0.13);
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
