@@ -733,6 +733,7 @@
       const rctx = rotated.getContext('2d');
       rctx.translate(rotated.width / 2, rotated.height / 2);
       rctx.rotate(Math.PI / 2);
+      rctx.scale(-1, 1);
       rctx.drawImage(wide, -w / 2, -h / 2);
 
       engravingTexture.image = rotated;
