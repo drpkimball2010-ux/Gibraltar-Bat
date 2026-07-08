@@ -605,7 +605,7 @@
     // ratio once rotated 90° so it reads level when the bat is held sideways.
     const LABEL_COLOR_KEYS = Object.keys(COLORS).filter(k => k !== 'striped' && k !== 'natural');
     const LABEL_TOP_IN    = 7;      // distance from tip to the label's top edge
-    const LABEL_HEIGHT_IN = 3.25;   // label span, top edge to bottom edge
+    let LABEL_HEIGHT_IN   = 3.25;   // label span, top edge to bottom edge; set per style below
     let LABEL_WIDTH_IN    = 3.25 * (312 / 544); // refined once the source image loads
 
     function hexToCss(hex) {
@@ -618,8 +618,8 @@
     // so it's used as-is with no extra rotation.
     let labelStyle = 'rock'; // 'rock' | 'gbrltr'
     const LABEL_STYLES = {
-      rock:   { src: 'images/label-logo.png',            rotate: true  },
-      gbrltr: { src: 'images/gbrltr-vertical-final.png',  rotate: false },
+      rock:   { src: 'images/label-logo.png',            rotate: true,  heightIn: 3.25 },
+      gbrltr: { src: 'images/gbrltr-vertical-final.png',  rotate: false, heightIn: 8    },
     };
     const labelImages = {
       rock:   new Image(),
@@ -645,6 +645,7 @@
         ctx.drawImage(img, 0, 0);
       }
       labelSourceCanvas = c;
+      LABEL_HEIGHT_IN = LABEL_STYLES[labelStyle].heightIn;
       LABEL_WIDTH_IN = LABEL_HEIGHT_IN * (c.width / c.height);
     }
 
