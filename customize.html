@@ -176,6 +176,22 @@
       object-fit: contain;
     }
 
+    .engraving-name-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.55rem 0.7rem;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 0.85rem;
+      color: var(--navy);
+      transition: border-color 0.15s;
+    }
+    .engraving-name-input:focus {
+      outline: none;
+      border-color: var(--navy);
+    }
+
     .color-name {
       font-family: Arial, sans-serif;
       font-size: 0.8rem;
@@ -405,6 +421,11 @@
         <div class="swatches" id="label-swatches"></div>
         <div class="color-name" id="label-name">Black</div>
         <p style="font-family:Arial,sans-serif; font-size:0.75rem; color:#999; margin-top:0.3rem;">Can't match the barrel color.</p>
+      </div>
+
+      <div class="config-group">
+        <label>Engraved Name (Optional)</label>
+        <input type="text" class="engraving-name-input" id="engraving-name-input" maxlength="24" placeholder="e.g. Danny Kimball" />
       </div>
 
       <hr class="config-divider" />
@@ -795,6 +816,7 @@
       fungo:     'Fungo Model',
     };
     const engravingTexture = new THREE.CanvasTexture(document.createElement('canvas'));
+    let engravingName = '';
 
     function updateEngravingTexture() {
       const modelName = ENGRAVING_MODEL_NAMES[batType] || 'Standard Model';
@@ -809,6 +831,11 @@
       wctx.textBaseline = 'middle';
       wctx.font = '700 68px Georgia, "Times New Roman", serif';
       wctx.fillText('Handcrafted For', w / 2, h * 0.13);
+      const name = engravingName.trim();
+      if (name) {
+        wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
+        wctx.fillText(name, w / 2, h * 0.40);
+      }
       wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
       wctx.fillText(modelName, w / 2, h * 0.67);
 
@@ -827,6 +854,11 @@
       engravingMat.needsUpdate = true;
     }
     updateEngravingTexture();
+
+    document.getElementById('engraving-name-input').addEventListener('input', (e) => {
+      engravingName = e.target.value;
+      updateEngravingTexture();
+    });
 
     const PRICES = {
       standard:  { maple: 145, birch: 130, ash: 85 },
