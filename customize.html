@@ -349,8 +349,7 @@
       <div class="config-group">
         <label>Bat Type</label>
         <div class="len-options">
-          <button class="len-btn active" data-type="sweetspot">The Sweet Spot</button>
-          <button class="len-btn" data-type="standard">Standard</button>
+          <button class="len-btn active" data-type="standard">Standard</button>
           <button class="len-btn" data-type="torpedo">Torpedo</button>
           <button class="len-btn" data-type="fungo">Fungo</button>
         </div>
@@ -603,7 +602,7 @@
     bat.add(handleMesh, barrelMesh, capMesh, knobCapMesh, labelMesh, engravingMesh);
 
     // ─── State ───────────────────────────────────────────────────────────────
-    let batType     = 'sweetspot';
+    let batType     = 'standard';
     let wood        = 'maple';
     let stdLength   = 33;
     let fungoLength = 36;
@@ -812,7 +811,6 @@
     const ENGRAVING_MODEL_NAMES = {
       standard:  'Standard Model',
       torpedo:   'Torpedo Model',
-      sweetspot: 'Sweet Spot Model',
       fungo:     'Fungo Model',
     };
     const engravingTexture = new THREE.CanvasTexture(document.createElement('canvas'));
@@ -863,7 +861,6 @@
     const PRICES = {
       standard:  { maple: 145, birch: 130, ash: 85 },
       torpedo:   { maple: 145, birch: 130, ash: 85 },
-      sweetspot: { maple: 145, birch: 130, ash: 85 },
       fungo:     { maple: 100, birch: 100, ash: 100 },
     };
 
@@ -878,7 +875,7 @@
       const len    = batType === 'fungo' ? fungoLength : stdLength;
       const w      = batType === 'fungo' ? 'Maple' : wood.charAt(0).toUpperCase() + wood.slice(1);
       const g      = grade === 'proreserve' ? ' Rock Solid - Prime' : '';
-      const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : batType === 'sweetspot' ? 'The Sweet Spot' : 'Standard';
+      const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : 'Standard';
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
       const label  = document.getElementById('label-name').textContent;
@@ -1155,94 +1152,12 @@
       engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
     }
 
-    // ─── Sweet Spot bat geometry ─────────────────────────────────────────────
-    // 8" barrel, 2.5" diameter, 10" proportional taper with rounded corners
-    function rebuildSweetSpot(length) {
-      const BR = 1.225;
-      const bl = 9;
-      const tl = 10 * (length / 33);
-      const hl = length - KNOB_H - tl - bl - BEVEL_H;
-
-      const yKnobEnd   = KNOB_H;
-      const yHandleEnd = yKnobEnd   + hl;
-      const yTaperEnd  = yHandleEnd + tl;
-      const yBarrelEnd = yTaperEnd  + bl;
-      const yTopFace   = yBarrelEnd + BEVEL_H;
-      currentYTopFace = yTopFace;
-
-      const PAINT_DEPTH = 15 * (length / 33);
-      const yPaint      = yTopFace - PAINT_DEPTH;
-
-      const taperR = t => {
-        const s = t * t * (2 - t);
-        return HANDLE_R + s * (BR - HANDLE_R);
-      };
-
-      const tPaint = (yPaint - yHandleEnd) / tl;
-      const rPaint = taperR(tPaint);
-
-      const mid = yTopFace / 2;
-      const S = SCALE;
-      const v = (r, y) => new THREE.Vector2(r * S, (y - mid) * S);
-
-      const hPts = [
-        v(0.85, 0), v(0.85, 0.333), v(0.80, 0.600),
-        v(0.72, 0.900), v(0.63, 1.200),
-        v(HANDLE_R, yKnobEnd), v(HANDLE_R, yHandleEnd),
-      ];
-      for (let i = 1; i <= 3; i++) {
-        const t = (i / 4) * tPaint;
-        hPts.push(v(taperR(t), yHandleEnd + t * tl));
-      }
-      hPts.push(v(rPaint, yPaint));
-
-      const bPts = [v(rPaint, yPaint)];
-      for (let i = 1; i <= 3; i++) {
-        const t = tPaint + (i / 4) * (1 - tPaint);
-        bPts.push(v(taperR(t), yHandleEnd + t * tl));
-      }
-      bPts.push(v(BR, yTaperEnd));
-      bPts.push(v(BR, yBarrelEnd));
-      for (let i = 1; i <= 6; i++) {
-        const theta = (Math.PI / 2) * (i / 6);
-        bPts.push(v((BR - BEVEL_IN) + BEVEL_IN * Math.cos(theta), yBarrelEnd + BEVEL_H * Math.sin(theta)));
-      }
-
-      const capR = (BR - BEVEL_IN) * S;
-      const capY = (yTopFace - mid) * S;
-
-      handleMesh.geometry.dispose();
-      barrelMesh.geometry.dispose();
-      capMesh.geometry.dispose();
-      knobCapMesh.geometry.dispose();
-
-      handleMesh.geometry = new THREE.LatheGeometry(hPts, SEG);
-      barrelMesh.geometry = new THREE.LatheGeometry(bPts, SEG);
-
-      const capGeo = new THREE.CircleGeometry(capR, SEG);
-      capGeo.rotateX(-Math.PI / 2);
-      capMesh.geometry = capGeo;
-      capMesh.position.y = capY;
-
-      const knobCapGeo = new THREE.CircleGeometry(0.85 * S, SEG);
-      knobCapGeo.rotateX(Math.PI / 2);
-      knobCapMesh.geometry = knobCapGeo;
-      knobCapMesh.position.y = (0 - mid) * S;
-
-      labelMesh.geometry.dispose();
-      labelMesh.geometry = buildLabelGeometry(hPts.concat(bPts), mid, S, yTopFace);
-      engravingMesh.geometry.dispose();
-      engravingMesh.geometry = buildEngravingGeometry(hPts.concat(bPts), mid, S, yTopFace);
-    }
-
     // ─── Dispatcher ──────────────────────────────────────────────────────────
     function rebuildBat() {
       const prevYTopFace = currentYTopFace;
 
       if (batType === 'torpedo') {
         rebuildTorpedo(stdLength);
-      } else if (batType === 'sweetspot') {
-        rebuildSweetSpot(stdLength);
       } else if (batType === 'fungo') {
         rebuildFungo(fungoLength);
       } else {
@@ -1328,7 +1243,7 @@
     // ─── Pre-select bat type from URL param (?type=torpedo etc.) ─────────────
     (function () {
       const param = new URLSearchParams(window.location.search).get('type');
-      if (param && ['standard', 'torpedo', 'sweetspot', 'fungo'].includes(param)) {
+      if (param && ['standard', 'torpedo', 'fungo'].includes(param)) {
         const btn = document.querySelector('[data-type="' + param + '"]');
         if (btn) btn.click();
       }
