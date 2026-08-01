@@ -818,6 +818,7 @@
 
     function updateEngravingTexture() {
       const modelName = ENGRAVING_MODEL_NAMES[batType] || 'Standard Model';
+      const name = engravingName.trim();
       const w = 900, h = 500;
       const wide = document.createElement('canvas');
       wide.width = w;
@@ -825,17 +826,25 @@
       const wctx = wide.getContext('2d');
       wctx.clearRect(0, 0, w, h);
       wctx.fillStyle = '#2a1a10';
-      wctx.textAlign = 'center';
+      wctx.textAlign = 'left';
       wctx.textBaseline = 'middle';
-      wctx.font = '700 68px Georgia, "Times New Roman", serif';
-      wctx.fillText('Handcrafted For', w / 2, h * 0.13);
-      const name = engravingName.trim();
-      if (name) {
-        wctx.font = 'italic 700 80px Georgia, "Times New Roman", serif';
-        wctx.fillText(name, w / 2, h * 0.40);
-      }
-      wctx.font = 'italic 700 56px Georgia, "Times New Roman", serif';
-      wctx.fillText(modelName, w / 2, h * 0.67);
+      const x = w * 0.16;
+
+      // Matches a real engraved bat: plain bold sans-serif, left-aligned to
+      // a shared edge, with the customer's name markedly bigger/bolder than
+      // the "Handcrafted For" / model lines around it — not italic serif
+      // centered independently, which is how this used to be drawn.
+      const lines = [{ text: 'Handcrafted For', font: '700 52px Arial, sans-serif' }];
+      if (name) lines.push({ text: name, font: '900 78px Arial, sans-serif' });
+      lines.push({ text: modelName, font: '700 52px Arial, sans-serif' });
+
+      const bandCenter = 0.46, bandHalfSpread = lines.length === 3 ? 0.17 : 0.11;
+      lines.forEach((line, i) => {
+        const t = lines.length === 1 ? 0.5 : i / (lines.length - 1);
+        const ratio = bandCenter - bandHalfSpread + t * (2 * bandHalfSpread);
+        wctx.font = line.font;
+        wctx.fillText(line.text, x, h * ratio);
+      });
 
       const rotated = document.createElement('canvas');
       rotated.width = h;
