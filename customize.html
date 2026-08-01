@@ -371,7 +371,7 @@
         <label>Grade</label>
         <div class="len-options">
           <button class="len-btn active" data-grade="standard">Standard</button>
-          <button class="len-btn" data-grade="proreserve">Rock Solid</button>
+          <button class="len-btn" data-grade="proreserve">Rock Solid - Prime</button>
         </div>
         <p id="standard-note" style="display:block; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Custom bats ship within 2–3 weeks.</p>
         <p id="pro-reserve-note" style="display:none; font-family:Arial,sans-serif; font-size:0.78rem; color:#888; margin-top:0.5rem;">Made to order — allow 4–5 weeks for delivery.</p>
@@ -877,7 +877,7 @@
     function getCartName() {
       const len    = batType === 'fungo' ? fungoLength : stdLength;
       const w      = batType === 'fungo' ? 'Maple' : wood.charAt(0).toUpperCase() + wood.slice(1);
-      const g      = grade === 'proreserve' ? ' Rock Solid' : '';
+      const g      = grade === 'proreserve' ? ' Rock Solid - Prime' : '';
       const type   = batType === 'fungo' ? 'Fungo' : batType === 'torpedo' ? 'Torpedo' : batType === 'sweetspot' ? 'The Sweet Spot' : 'Standard';
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
