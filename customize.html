@@ -148,34 +148,6 @@
       );
     }
 
-    .label-style-options {
-      display: flex;
-      gap: 0.6rem;
-    }
-    .style-btn {
-      flex: 1;
-      height: 64px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      background: white;
-      cursor: pointer;
-      padding: 0.4rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .style-btn:hover { border-color: var(--navy); }
-    .style-btn.active {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px var(--navy);
-    }
-    .style-btn img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
     .engraving-name-input {
       width: 100%;
       box-sizing: border-box;
@@ -411,11 +383,6 @@
       </div>
 
       <div class="config-group">
-        <label>Label Style</label>
-        <div class="label-style-options" id="label-style-options"></div>
-      </div>
-
-      <div class="config-group">
         <label>Label Color</label>
         <div class="swatches" id="label-swatches"></div>
         <div class="color-name" id="label-name">Black</div>
@@ -625,77 +592,27 @@
     // ratio once rotated 90° so it reads level when the bat is held sideways.
     const LABEL_COLOR_KEYS = Object.keys(COLORS).filter(k => k !== 'striped' && k !== 'natural');
     const LABEL_TOP_IN    = 7;      // distance from tip to the label's top edge
-    let LABEL_HEIGHT_IN   = 3.25;   // label span, top edge to bottom edge; set per style below
+    const LABEL_HEIGHT_IN = 3.25;   // label span, top edge to bottom edge
     let LABEL_WIDTH_IN    = 3.25 * (312 / 544); // refined once the source image loads
 
     function hexToCss(hex) {
       return '#' + hex.toString(16).padStart(6, '0');
     }
 
-    // Two selectable label artworks. The rock logo is landscape source art
-    // that gets rotated 90° onto the vertical decal (see buildLabelSourceCanvas).
-    // The GBRLTR wordmark is already drawn vertically (top-to-bottom reading),
-    // so it's used as-is with no extra rotation.
-    let labelStyle = 'rock'; // 'rock' | 'gbrltr'
-    const LABEL_STYLES = {
-      rock:   { src: 'images/label-logo.png',            rotate: true,  heightIn: 3.25 },
-      gbrltr: { src: 'images/gbrltr-vertical-final.png',  rotate: false, heightIn: 6    },
-    };
-    const labelImages = {
-      rock:   new Image(),
-      gbrltr: new Image(),
-    };
+    const labelImg = new Image();
     let labelSourceCanvas = null;
 
     function buildLabelSourceCanvas() {
-      const img = labelImages[labelStyle];
-      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const iw = labelImg.naturalWidth, ih = labelImg.naturalHeight;
       const c = document.createElement('canvas');
-      if (LABEL_STYLES[labelStyle].rotate) {
-        c.width = ih;
-        c.height = iw;
-        const ctx = c.getContext('2d');
-        ctx.translate(c.width / 2, c.height / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.drawImage(img, -iw / 2, -ih / 2);
-      } else {
-        c.width = iw;
-        c.height = ih;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-      }
+      c.width = ih;
+      c.height = iw;
+      const ctx = c.getContext('2d');
+      ctx.translate(c.width / 2, c.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.drawImage(labelImg, -iw / 2, -ih / 2);
       labelSourceCanvas = c;
-      LABEL_HEIGHT_IN = LABEL_STYLES[labelStyle].heightIn;
-      LABEL_WIDTH_IN = LABEL_HEIGHT_IN * (c.width / c.height);
     }
-
-    function setLabelStyle(style) {
-      if (style === labelStyle) return;
-      labelStyle = style;
-      document.querySelectorAll('#label-style-options .style-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.style === style);
-      });
-      buildLabelSourceCanvas();
-      applyLabelColor(labelColorKey);
-      rebuildBat();
-    }
-
-    function buildLabelStyleOptions() {
-      const wrap = document.getElementById('label-style-options');
-      Object.keys(LABEL_STYLES).forEach(style => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'style-btn' + (style === labelStyle ? ' active' : '');
-        btn.dataset.style = style;
-        const img = document.createElement('img');
-        img.src = LABEL_STYLES[style].src;
-        img.alt = style;
-        btn.appendChild(img);
-        btn.addEventListener('click', () => setLabelStyle(style));
-        wrap.appendChild(btn);
-      });
-    }
-    buildLabelStyleOptions();
 
     const labelTexture = new THREE.CanvasTexture(document.createElement('canvas'));
 
@@ -786,19 +703,14 @@
       return buildDecalGeometry(profilePts, mid, S, yTopFace, ENGRAVING_TOP_IN, ENGRAVING_HEIGHT_IN, ENGRAVING_WIDTH_IN);
     }
 
-    let labelImagesLoaded = 0;
-    function onLabelImgLoad() {
-      labelImagesLoaded++;
-      if (labelImagesLoaded < Object.keys(labelImages).length) return;
+    labelImg.onload = () => {
+      LABEL_WIDTH_IN = LABEL_HEIGHT_IN * (labelImg.naturalHeight / labelImg.naturalWidth);
       buildLabelSourceCanvas();
       applyLabelColor(labelColorKey);
       labelMesh.visible = true;
       rebuildBat();
-    }
-    Object.keys(labelImages).forEach(style => {
-      labelImages[style].onload = onLabelImgLoad;
-      labelImages[style].src = LABEL_STYLES[style].src;
-    });
+    };
+    labelImg.src = 'images/label-logo.png';
 
     // ─── "Handcrafted For [Model]" engraving ──────────────────────────────────
     // Positioned near the tip, ahead of the label, and always present (not a
