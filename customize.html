@@ -879,7 +879,8 @@
       const barrel = document.getElementById('barrel-name').textContent;
       const handle = document.getElementById('handle-name').textContent;
       const label  = document.getElementById('label-name').textContent;
-      return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle + ', Label: ' + label;
+      const engraving = engravingName.trim() ? ', Engraving: "' + engravingName.trim() + '"' : '';
+      return 'Custom ' + w + g + ' ' + len + '" ' + type + ' — Barrel: ' + barrel + ', Handle: ' + handle + ', Label: ' + label + engraving;
     }
 
     function updatePrice() {
