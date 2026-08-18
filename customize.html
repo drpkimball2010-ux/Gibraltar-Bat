@@ -127,18 +127,15 @@
       cursor: not-allowed;
     }
     .swatch:disabled:hover { transform: none; }
-    .swatch[data-color="natural"] { background: #C8A96E; }
-    .swatch[data-color="white"]   { background: #EEEAE0; border: 1.5px solid #ccc; }
-    .swatch[data-color="walnut"]  { background: #4A2810; }
-    .swatch[data-color="red"]     { background: #CC0000; }
-    .swatch[data-color="maroon"]  { background: #7A0C20; }
-    .swatch[data-color="orange"]  { background: #D45000; }
-    .swatch[data-color="black"]   { background: #111111; }
-    .swatch[data-color="blue"]    { background: #1040BB; }
-    .swatch[data-color="green"]   { background: #1A5C2E; }
-    .swatch[data-color="purple"]  { background: #5B1A8B; }
-    .swatch[data-color="pink"]    { background: #CC2266; }
-    .swatch[data-color="yellow"]  { background: #D4A000; }
+    .swatch[data-color="natural"]     { background: #C8A96E; }
+    .swatch[data-color="white"]       { background: #EEEAE0; border: 1.5px solid #ccc; }
+    .swatch[data-color="black"]       { background: #111111; }
+    .swatch[data-color="applered"]    { background: #C00027; }
+    .swatch[data-color="huntergreen"] { background: #004924; }
+    .swatch[data-color="deepblue"]    { background: #244E8A; }
+    .swatch[data-color="yellowsun"]   { background: #FDE930; }
+    .swatch[data-color="purple"]      { background: #5B1A8B; }
+    .swatch[data-color="pink"]        { background: #CC2266; }
     .swatch[data-color="striped"] {
       background: repeating-linear-gradient(
         to bottom,
@@ -510,19 +507,16 @@
     }
 
     const COLORS = {
-      natural: { label: 'Natural', hex: 0xC8A96E, roughness: 0.78, metalness: 0.04 },
-      white:   { label: 'White',   hex: 0xEEEAE0, roughness: 0.25, metalness: 0.05 },
-      walnut:  { label: 'Walnut',  hex: 0x4A2810, roughness: 0.72, metalness: 0.04 },
-      red:     { label: 'Red',     hex: 0xCC0000, roughness: 0.62, metalness: 0.04 },
-      maroon:  { label: 'Maroon',  hex: 0x7A0C20, roughness: 0.62, metalness: 0.04 },
-      orange:  { label: 'Orange',  hex: 0xD45000, roughness: 0.62, metalness: 0.04 },
-      black:   { label: 'Black',   hex: 0x111111, roughness: 0.28, metalness: 0.05 },
-      blue:    { label: 'Blue',    hex: 0x1040BB, roughness: 0.62, metalness: 0.04 },
-      green:   { label: 'Green',   hex: 0x1A5C2E, roughness: 0.62, metalness: 0.04 },
-      purple:  { label: 'Purple',  hex: 0x5B1A8B, roughness: 0.62, metalness: 0.04 },
-      pink:    { label: 'Pink',    hex: 0xCC2266, roughness: 0.62, metalness: 0.04 },
-      yellow:  { label: 'Yellow',  hex: 0xD4A000, roughness: 0.62, metalness: 0.04 },
-      striped: { label: 'Striped', texture: null,  roughness: 0.80, metalness: 0.03 },
+      natural:    { label: 'Natural',              hex: 0xC8A96E, roughness: 0.78, metalness: 0.04 },
+      white:      { label: 'White',                hex: 0xEEEAE0, roughness: 0.25, metalness: 0.05 },
+      black:      { label: 'Black',                hex: 0x111111, roughness: 0.28, metalness: 0.05 },
+      applered:   { label: 'Gloss Apple Red',       hex: 0xC00027, roughness: 0.2,  metalness: 0.04 },
+      huntergreen:{ label: 'Gloss Hunter Green',    hex: 0x004924, roughness: 0.2,  metalness: 0.04 },
+      deepblue:   { label: 'Gloss Deep Blue',       hex: 0x244E8A, roughness: 0.2,  metalness: 0.04 },
+      yellowsun:  { label: 'Gloss Yellow Sun',      hex: 0xFDE930, roughness: 0.2,  metalness: 0.04 },
+      purple:     { label: 'Purple',                hex: 0x5B1A8B, roughness: 0.62, metalness: 0.04 },
+      pink:       { label: 'Pink',                  hex: 0xCC2266, roughness: 0.62, metalness: 0.04 },
+      striped:    { label: 'Striped', texture: null, roughness: 0.80, metalness: 0.03 },
     };
     COLORS.striped.texture = createStripedTexture();
 
